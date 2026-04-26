@@ -1,164 +1,125 @@
+# 🍽️ Feasto – Modern Full-Stack Food Delivery & Management Platform
 
-# 🍽️ Feasto – Full Stack Food Ordering Platform (MERN)
+[![MERN Stack](https://img.shields.io/badge/MERN-Stack-blue.svg)](https://www.mongodb.com/mern-stack)
+[![Stripe Integration](https://img.shields.io/badge/Payments-Stripe-6772e5.svg)](https://stripe.com/)
+[![AI Powered](https://img.shields.io/badge/AI-Gemini-orange.svg)](https://deepmind.google/technologies/gemini/)
+[![Vite](https://img.shields.io/badge/Frontend-Vite-646CFF.svg)](https://vitejs.dev/)
 
-🚀 **Live Project:** https://feasto-delta.vercel.app/ 
+**Feasto** is a high-performance, full-stack food delivery ecosystem designed to bridge the gap between customers and administrative management. Built with the **MERN stack**, it features a secure checkout flow via **Stripe**, real-time order tracking, and an **AI-driven food recommendation engine** powered by Google Gemini.
 
-📂[GitHub Repository](https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform)
+🚀 **Live Project:** [feasto-delta.vercel.app](https://feasto-delta.vercel.app/)
+
 ---
 
-## 🖼️ Project Preview
+## 🌟 Key Features
+
+### 🛒 Customer Experience
+- **Intuitive Menu Browsing:** Seamless navigation through categorized food items with dynamic filtering.
+- **Persistent Cart Logic:** Real-time cart updates with automatic subtotal and delivery fee calculations.
+- **Secure Stripe Checkout:** Integrated payment gateway for encrypted, PCI-compliant transactions.
+- **AI Recipe Generator:** Leverage Google Gemini to discover recipes and food insights directly within the app.
+- **Order Tracking:** Monitor the status of orders from "Food Processing" to "Delivered".
+
+### 🛡️ Administrative Control
+- **Inventory Management:** Full CRUD capabilities for food items, including multi-part form data handling (image uploads via Multer).
+- **Order Orchestration:** A centralized dashboard to manage customer orders and update delivery statuses.
+- **Secure Admin Access:** Protected routes ensuring only authorized personnel can access the management panel.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 19, Vite, Vanilla CSS, Axios, React Router 7 |
+| **Backend** | Node.js, Express.js (MVC Architecture) |
+| **Database** | MongoDB, Mongoose ODM |
+| **AI / ML** | Google Gemini (Generative AI) |
+| **Payments** | Stripe API |
+| **Authentication** | JWT (JSON Web Tokens), Bcrypt.js |
+| **DevOps/Tools** | Multer (File Storage), Validator.js, Nodemon, Git |
+
+---
+
+## 🏗️ System Overview & Architecture
+
+Feasto follows a modern **decoupled architecture**, separating the user-facing storefront, the administrative dashboard, and the centralized API server.
+
+### 🔄 Data Flow
+1. **Frontend (Client/Admin):** Built with **React 19** for a fast, reactive UI. Uses **Axios** for asynchronous communication with the backend.
+2. **Backend (Server):** An **Express.js** REST API implementing the **MVC (Model-View-Controller)** pattern for clean separation of concerns.
+3. **Database (MongoDB):** Stores user data, food inventory, and order history using **Mongoose** for schema validation.
+4. **Security Layer:** Implements **JWT-based stateless authentication** and **CORS** policies for secure cross-origin resource sharing.
+
+---
+
+## 🔑 Key Functionalities
+
+### 1. **AI-Driven Personalization**
+The platform integrates the `@google/genai` SDK to provide intelligent food insights. By analyzing user input, the system generates recipes and recommendations, adding a modern AI layer to the traditional food delivery model.
+
+### 2. **Transactional Integrity**
+Using **Stripe's Payment Intent API**, the application ensures that payments are authorized and captured securely. The backend validates the order details before finalizing the transaction to prevent data tampering.
+
+### 3. **Scalable Image Storage**
+Utilizing **Multer middleware**, the server handles multipart/form-data for food image uploads, storing them locally and serving them via static Express routes for high availability.
+
+---
+
+## 🖼️ Project Screenshots
 
 <p align="center">
-  <img width="1898" height="867" alt="Screenshot 2025-12-20 145040" src="https://github.com/user-attachments/assets/6f9fe488-83c1-4eee-a5e2-f82aec5ac569" />
-
+  <img width="1898" height="867" alt="Home Page" src="https://github.com/user-attachments/assets/6f9fe488-83c1-4eee-a5e2-f82aec5ac569" />
   <br/><br/>
- <img width="1895" height="868" alt="Screenshot 2025-12-20 145135" src="https://github.com/user-attachments/assets/40ba4b9b-e991-4e7a-84dc-8ed0e7d2b763" />
-
+  <img width="1895" height="868" alt="Menu Section" src="https://github.com/user-attachments/assets/40ba4b9b-e991-4e7a-84dc-8ed0e7d2b763" />
   <br/><br/>
-  <img width="1899" height="870" alt="Screenshot 2025-12-20 145203" src="https://github.com/user-attachments/assets/1bc763f5-2e4e-4aee-b4c4-992e5f9dfd0a" />
-
+  <img width="1899" height="870" alt="Cart View" src="https://github.com/user-attachments/assets/1bc763f5-2e4e-4aee-b4c4-992e5f9dfd0a" />
   <br/><br/>
-  <img width="1899" height="868" alt="Screenshot 2025-12-20 145111" src="https://github.com/user-attachments/assets/c69a9b6b-a5d8-4e53-97d2-0608ecddee61" />
-
-  <br/><br/>
-  <img width="1902" height="867" alt="Screenshot 2025-12-20 145222" src="https://github.com/user-attachments/assets/77730379-5051-4b6d-b3a6-86116fc8ae03" />
-
-  <br/><br/>
- <img width="1901" height="873" alt="Screenshot 2025-12-20 145814" src="https://github.com/user-attachments/assets/d83dd4b3-4984-4dca-92d2-19269318d1db" />
-
-  <br/><br/>
- <img width="1899" height="868" alt="Screenshot 2025-12-20 145111" src="https://github.com/user-attachments/assets/86421631-3016-40f4-8f76-5bca1976356e" />
-
+  <img width="1901" height="873" alt="Admin Dashboard" src="https://github.com/user-attachments/assets/d83dd4b3-4984-4dca-92d2-19269318d1db" />
 </p>
 
-
 ---
 
-## 📖 About the Project
+## ⚙️ Installation & Setup
 
-**Feasto** is a modern, full-stack food ordering web application built using the **MERN Stack**.  
-It provides a seamless user experience for ordering food online, secure online payments using **Stripe**, real-time order tracking, and a powerful admin dashboard for managing products and orders.
+### Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas account or local MongoDB
+- Stripe API Keys
+- Google Gemini API Key
 
----
-
-## 🚀 Features
-
-### 👤 User Side
-- Browse food items by category
-- Add / remove items from cart
-- Dynamic cart total calculation
-- Secure checkout flow
-- Online payments using **Stripe**
-- Order placement & tracking
-- Order history
-- Responsive & modern UI
-
-### 🛠️ Admin Panel
-- Add new food items with image upload
-- List & delete food items
-- View all customer orders
-- Update order status:
-  - Food Processing
-  - Out for Delivery
-  - Delivered
-- Admin protected routes
-
----
-
-## 🧩 Tech Stack
-
-### Frontend
-- React.js
-- CSS / Tailwind CSS
-- Axios
-- React Router
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB (Mongoose)
-
-### Payments
-- Stripe Payment Gateway
-
-### Authentication
-- JWT (JSON Web Token)
-
----
-
-## 🏗️ Project Structure
-
-```
-Feasto/
-│
-├── frontend/
-│   ├── src/
-│   ├── components/
-│   ├── pages/
-│   └── App.jsx
-│
-├── backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   └── server.js
-│
-└── admin/
-    ├── pages/
-    └── components/
+### 1. Clone the Repository
+```bash
+git clone https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform.git
+cd Feasto-Food-Delivery-Platform
 ```
 
----
-
-## 💳 Stripe Payment Integration
-
-- Secure card payments using Stripe
-- Backend payment intent creation
-- Test & Live mode supported
-
+### 2. Configure Environment Variables
+Create a `.env` file in the `server/` directory:
 ```env
-STRIPE_SECRET_KEY=your_stripe_secret_key
-```
-
----
-
-## 🔐 Environment Variables
-
-Create a `.env` file in **backend/**
-
-```env
-PORT=5000
+PORT=4000
 MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_secure_random_string
 STRIPE_SECRET_KEY=your_stripe_secret_key
+GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
----
-
-## 🛠️ Installation & Setup
-
-### Clone the repository
+### 3. Install Dependencies & Start
+**Server:**
 ```bash
-git clone https://github.com/yourusername/feasto.git
-cd feasto
+cd server
+npm install
+npm run server
 ```
 
-### Backend Setup
+**Client (Frontend):**
 ```bash
-cd backend
+cd client
 npm install
 npm run dev
 ```
 
-### Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Admin Panel Setup
+**Admin Panel:**
 ```bash
 cd admin
 npm install
@@ -167,30 +128,18 @@ npm run dev
 
 ---
 
-## ✨ UI Highlights
-- Premium clean layout
-- Mobile responsive design
-- Smooth checkout experience
-- Modern admin dashboard
-
----
-
-## 📌 Future Enhancements
-- Live delivery tracking
-- Ratings & reviews
-- Push notifications
-- Admin analytics dashboard
-- Mobile app (React Native)
+## 🚀 Future Enhancements
+- [ ] **Real-Time Map Integration:** Live delivery tracking using Google Maps API.
+- [ ] **Social Authentication:** One-click login with Google/GitHub.
+- [ ] **Advanced Analytics:** Sales charts and user behavior tracking for admins.
+- [ ] **Push Notifications:** Alerting users on order status changes.
 
 ---
 
 ## 👨‍💻 Author
-
-**YOURBOSS**  
-Full Stack MERN Developer  
+**Sarthak Dudhe**  
+*Full Stack Developer | AI Enthusiast*  
+[GitHub](https://github.com/SarthakDudhe) | [LinkedIn](https://www.linkedin.com/in/sarthak-dudhe/)
 
 ---
-
-## ⭐ Support
-
-If you like this project, don’t forget to **star ⭐ the repository**!
+⭐ **Star this repository if you found it helpful!**
