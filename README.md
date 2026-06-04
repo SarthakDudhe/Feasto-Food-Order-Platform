@@ -1,7 +1,3 @@
-<div align="center">
-  <img width="1898" height="912" alt="Screenshot 2026-04-28 210140" src="https://github.com/user-attachments/assets/51ea4f15-b988-4503-a5a2-ce6cb8e2a8cf" />
-
-</div>
 
 <div align="center">
 <img width="80" height="80" alt="image" src="https://github.com/user-attachments/assets/0ba1d905-ed5d-4c7c-90d2-b79daace36d2" />
@@ -15,7 +11,8 @@
 
 
 <div align="center">
-  <img src="./banner.png" alt="Feasto Hero Banner" width="800" />
+  <img width="1898" height="912" alt="Screenshot 2026-04-28 210140" src="https://github.com/user-attachments/assets/51ea4f15-b988-4503-a5a2-ce6cb8e2a8cf" />
+
 </div>
 
 <div align="center">
