@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-  <img src="https://via.placeholder.com/150/1a1a2e/ffffff?text=Logo" alt="Feasto Logo" width="120" height="120" />
+  <img src="./logo.png" alt="Feasto Logo" width="150" height="150" />
 </div>
 
 <h1 align="center">Feasto</h1>
@@ -60,6 +60,20 @@ For the business, it represents **scalable operations** and **transactional inte
 - **Decoupled Admin Client:** A separate, secure portal ensuring operations don't interfere with consumer traffic.
 - **Full Inventory Orchestration:** Streamlined CRUD interfaces for menu management, including robust multipart/form-data processing for high-quality food imagery via Multer.
 - **Order Lifecycle Management:** Centralized hub for operators to mutate order statuses and track operational throughput.
+
+---
+
+## 🖼️ Project Screenshots
+
+<p align="center">
+  <img width="1898" height="867" alt="Home Page" src="https://github.com/user-attachments/assets/6f9fe488-83c1-4eee-a5e2-f82aec5ac569" />
+  <br/><br/>
+  <img width="1895" height="868" alt="Menu Section" src="https://github.com/user-attachments/assets/40ba4b9b-e991-4e7a-84dc-8ed0e7d2b763" />
+  <br/><br/>
+  <img width="1899" height="870" alt="Cart View" src="https://github.com/user-attachments/assets/1bc763f5-2e4e-4aee-b4c4-992e5f9dfd0a" />
+  <br/><br/>
+  <img width="1901" height="873" alt="Admin Dashboard" src="https://github.com/user-attachments/assets/d83dd4b3-4984-4dca-92d2-19269318d1db" />
+</p>
 
 ---
 
