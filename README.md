@@ -1,6 +1,6 @@
 
 <div align="center">
-<img width="80" height="80" alt="image" src="https://github.com/user-attachments/assets/0ba1d905-ed5d-4c7c-90d2-b79daace36d2" />
+<img width="80" height="80" alt="Feasto-removebg-preview" src="https://github.com/user-attachments/assets/3d4012e9-cbf5-4ff1-bc90-032fed7f978b" />
 
 </div>
 
