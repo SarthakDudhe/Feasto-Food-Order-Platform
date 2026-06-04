@@ -1,6 +1,6 @@
 
 <div align="center">
-<img width="80" height="80" alt="Feasto-removebg-preview" src="https://github.com/user-attachments/assets/3d4012e9-cbf5-4ff1-bc90-032fed7f978b" />
+<img width="85" height="85" alt="ChatGPT Image Jun 4, 2026, 12_35_59 PM" src="https://github.com/user-attachments/assets/268a50fc-5082-4e64-815a-98a3751f3259" />
 
 </div>
 
