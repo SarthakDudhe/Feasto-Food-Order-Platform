@@ -1,12 +1,14 @@
 <div align="center">
-  <img src="https://via.placeholder.com/1200x300/1a1a2e/ffffff?text=Feasto+Banner+Placeholder" alt="Feasto Hero Banner" />
+  <img width="1898" height="912" alt="Screenshot 2026-04-28 210140" src="https://github.com/user-attachments/assets/51ea4f15-b988-4503-a5a2-ce6cb8e2a8cf" />
+
 </div>
 
 <div align="center">
-  <img src="./logo.png" alt="Feasto Logo" width="150" height="150" />
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/0ba1d905-ed5d-4c7c-90d2-b79daace36d2" />
+
 </div>
 
-<h1 align="center">Feasto</h1>
+
 <p align="center">
   <strong>A Premium Full-Stack Food Delivery & Management Ecosystem Powered by AI</strong>
 </p>
