@@ -4,7 +4,7 @@
 </div>
 
 <div align="center">
-<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/0ba1d905-ed5d-4c7c-90d2-b79daace36d2" />
+<img width="80" height="80" alt="image" src="https://github.com/user-attachments/assets/0ba1d905-ed5d-4c7c-90d2-b79daace36d2" />
 
 </div>
 
@@ -12,6 +12,7 @@
 <p align="center">
   <strong>A Premium Full-Stack Food Delivery & Management Ecosystem Powered by AI</strong>
 </p>
+
 
 <div align="center">
   <img src="./banner.png" alt="Feasto Hero Banner" width="800" />
