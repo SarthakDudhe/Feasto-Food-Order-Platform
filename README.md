@@ -1,10 +1,6 @@
-<div align="center">
-  <img width="1898" height="912" alt="Screenshot 2026-04-28 210140" src="https://github.com/user-attachments/assets/51ea4f15-b988-4503-a5a2-ce6cb8e2a8cf" />
-
-</div>
 
 <div align="center">
-<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/0ba1d905-ed5d-4c7c-90d2-b79daace36d2" />
+<img width="90" height="85" alt="ChatGPT Image Jun 4, 2026, 12_35_59 PM" src="https://github.com/user-attachments/assets/268a50fc-5082-4e64-815a-98a3751f3259" />
 
 </div>
 
@@ -13,8 +9,10 @@
   <strong>A Premium Full-Stack Food Delivery & Management Ecosystem Powered by AI</strong>
 </p>
 
+
 <div align="center">
-  <img src="./banner.png" alt="Feasto Hero Banner" width="800" />
+  <img width="1898" height="912" alt="Screenshot 2026-04-28 210140" src="https://github.com/user-attachments/assets/51ea4f15-b988-4503-a5a2-ce6cb8e2a8cf" />
+
 </div>
 
 <div align="center">
