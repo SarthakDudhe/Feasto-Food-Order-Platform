@@ -102,7 +102,8 @@ Use these placeholders if you want to turn the README into a more visual product
 
 | Visual | Recommended Size | What Should Be Shown |
 | --- | --- | --- |
-| Hero banner | `1600 × 600` | A premium Feasto banner with the current warm red / cream UI language |
+| Hero banner |  <img width="1600" height="600" alt="image" src="https://github.com/user-attachments/assets/3a3d620d-e931-44b1-9e6a-e0edb4a3b7fd" />
+| A premium Feasto banner with the current warm red / cream UI language |
 | Customer home screenshot | `1440 × 900` | Homepage hero, promo carousel, menu browser, and food cards |
 | Cart screen | `1440 × 900` | Cart table, promo code block, totals panel, checkout CTA |
 | Checkout screen | `1440 × 1100` | Delivery form, totals summary, and payment CTA |
