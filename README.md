@@ -7,9 +7,6 @@
 
 <img width="120"  alt="ChatGPT Image Jun 4, 2026, 12_35_59 PM" src="https://github.com/user-attachments/assets/7d579b8e-5da1-48b6-ba26-1b493e018ee4" />
 
-
-<h1>Feasto</h1>
-
 <p><strong>Premium food ordering, AI recipe assistance, and admin operations in one full-stack monorepo.</strong></p>
 
 <p>
