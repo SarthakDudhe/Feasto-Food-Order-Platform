@@ -1,10 +1,12 @@
 <div align="center">
 
-<img src="https://placehold.co/1400x320/fff1eb/2c211d?text=Feasto+%E2%80%94+Premium+Food+Delivery+Platform" alt="Feasto hero banner placeholder" />
+<img width="1600" height="650" alt="image" src="https://github.com/user-attachments/assets/28a43d7f-89b0-472e-8037-0c32e4ea9435" />
+
 
 <br /><br />
 
-<img src="https://placehold.co/140x140/fff1eb/2c211d?text=Feasto" alt="Feasto logo placeholder" width="120" />
+<img width="120"  alt="ChatGPT Image Jun 4, 2026, 12_35_59 PM" src="https://github.com/user-attachments/assets/7d579b8e-5da1-48b6-ba26-1b493e018ee4" />
+
 
 <h1>Feasto</h1>
 
@@ -40,25 +42,6 @@
 
 ---
 
-## Repository Snapshot
-
-| Item | Status |
-| --- | --- |
-| Customer app | `client/` — React 19 + Vite |
-| Admin app | `admin/` — React 19 + Vite |
-| Backend API | `server/` — Node.js + Express + MongoDB |
-| AI assistant | Gemini recipe generator via `/api/ai/chat-recommend` |
-| Payments | Stripe Checkout session flow |
-| Authentication | JWT + bcrypt |
-| Current UI direction | Warm Premium Diner |
-| Repository stats | ⭐ Stars: `TBD` • 🍴 Forks: `TBD` • 🐛 Issues: `TBD` • 🤝 PRs: `TBD` |
-| Deployment status | Backend API referenced in code on Render; frontend apps use local Vite dev servers unless deployed separately |
-
-> **Note:** This repository uses separate frontend apps and a shared backend.  
-> Several frontend API base URLs are hardcoded in source files and should be updated when running locally against a different backend URL.
-
----
-
 ## Live Demo & Deployment Status
 
 > Replace these placeholders with your actual deployed URLs when you publish the project.
@@ -68,60 +51,6 @@
 | Customer app | `https://your-customer-demo.example` | Customer ordering experience |
 | Admin app | `https://your-admin-demo.example` | Operational management console |
 | Backend API | `https://feasto-backend-e0ic.onrender.com` | Current backend URL referenced in the code |
-
----
-
-## Table of Contents
-
-- [Why This Project Matters](#why-this-project-matters)
-- [What Feasto Does](#what-feasto-does)
-- [Visual Asset Placeholders](#visual-asset-placeholders)
-- [Product Walkthrough](#product-walkthrough)
-- [Architecture](#architecture)
-- [Technical Excellence](#technical-excellence)
-- [Technology Ecosystem](#technology-ecosystem)
-- [Project Metrics](#project-metrics)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [Database Schema](#database-schema)
-- [Folder Structure](#folder-structure)
-- [Security Considerations](#security-considerations)
-- [Testing Strategy](#testing-strategy)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-
----
-
-## Why This Project Matters
-
-Food delivery products succeed or fail on three things:
-
-1. **How fast customers can decide what to order**
-2. **How reliably payments and order states are handled**
-3. **How efficiently the business can manage menu and order operations**
-
-Feasto solves all three inside one cohesive platform.
-
-- The **customer app** removes friction through a clean menu browser, a persistent cart, promo-code support, checkout, order history, and a Gemini-powered recipe assistant.
-- The **admin app** gives restaurant operators a dedicated control panel for adding food items, managing menu inventory, and updating order status.
-- The **backend** ties everything together with JWT authentication, MongoDB persistence, coupon validation, Stripe Checkout, image uploads, and AI-assisted recipe generation.
-
-This is valuable for:
-
-- **Customers** who want a fast, premium, low-friction ordering experience
-- **Operators** who need a simple but powerful menu/order management workflow
-- **Recruiters and engineering leads** who want to see a full-stack architecture with real business logic, not just static UI
-
-From a product perspective, Feasto demonstrates:
-
-- transactional integrity
-- scalable separation of concerns
-- reusable cross-app state handling
-- production-style auth + payment flow
-- practical AI integration with prompt sanitization
-- a polished UI system that can evolve into a real SaaS platform
 
 ---
 
@@ -408,22 +337,6 @@ This separation makes the system easier to reason about, extend, and deploy inde
     <td>Backend referenced on Render; admin contains Vercel-compatible config; local frontend dev via Vite</td>
   </tr>
 </table>
-
----
-
-## Project Metrics
-
-> These are placeholder metrics you can replace after profiling or production rollout.
-
-| Metric | Target | Current Status |
-| --- | ---: | --- |
-| Customer app Lighthouse score | 90+ | TBD |
-| Admin app Lighthouse score | 90+ | TBD |
-| API response time | &lt; 200 ms | TBD |
-| Stripe checkout conversion | High / measurable | TBD |
-| Test coverage | 80%+ | TBD |
-| Bundle size optimization | Lean Vite output | Verified by build, exact benchmark TBD |
-| Production uptime | 99.9%+ | TBD |
 
 ---
 
