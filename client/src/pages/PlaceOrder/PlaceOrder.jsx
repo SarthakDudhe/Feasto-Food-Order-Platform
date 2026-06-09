@@ -4,7 +4,7 @@ import { StoreContext } from '../../context/StoreContext'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 const PlaceOrder = () => {
-const {getTotalCartAmount,token,food_list,cartItems,url} = useContext(StoreContext)
+const {getTotalCartAmount,getDeliveryFee,getCartDiscount,getFinalCartTotal,appliedCoupon,token,food_list,cartItems,url} = useContext(StoreContext)
 
 
 
@@ -33,7 +33,7 @@ const placeOrder = async (event) => {
   let orderItems = [];
   food_list.map((item)=>{
 if (cartItems[item._id]>0) {
-  let itemInfo = item;
+  let itemInfo = {...item};
   itemInfo["quantity"] = cartItems[item._id];
   orderItems.push(itemInfo)
 }
@@ -41,7 +41,8 @@ if (cartItems[item._id]>0) {
 let orderData = {
   address:data,
   items:orderItems,
-  amount:getTotalCartAmount()+2,
+  amount:getFinalCartTotal(),
+  couponCode:appliedCoupon?.code || "",
 }
   let response = await axios.post(url+"/api/order/place",orderData,{headers:{token}})
   if (response.data.success) {
@@ -53,10 +54,15 @@ let orderData = {
   }
 }
 const navigate = useNavigate()
+const subtotal = getTotalCartAmount();
+const discount = getCartDiscount();
+const deliveryFee = getDeliveryFee();
+const total = getFinalCartTotal();
+
 useEffect(()=>{
 if (!token) {
   navigate("/cart")
-}else if(getTotalCartAmount() ===0)
+}else if(subtotal ===0)
 {
   navigate("/cart")
 }
@@ -89,17 +95,26 @@ if (!token) {
           <div>
             <div className="cart-total-details">
               <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>${subtotal}</p>
             </div>
             <hr />
+            {discount > 0 && (
+              <>
+                <div className="cart-total-details cart-total-discount">
+                  <p>Discount ({appliedCoupon.code})</p>
+                  <p>-${discount.toFixed(2)}</p>
+                </div>
+                <hr />
+              </>
+            )}
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() === 0? 0 : 2}</p>
+              <p>${deliveryFee}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>${getTotalCartAmount()===0 ? 0:getTotalCartAmount()+2}</b>
+              <b>${total.toFixed(2)}</b>
             </div>
             <hr />
           </div>

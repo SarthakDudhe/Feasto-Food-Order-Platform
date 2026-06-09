@@ -33,3 +33,6 @@
 .place-order .cart-total button{
     margin-top: 30px;
 }
+.place-order .cart-total-discount{
+    color: #15803d;
+}

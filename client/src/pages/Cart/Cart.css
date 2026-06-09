@@ -57,6 +57,9 @@ color: black;
     justify-content: space-between;
     color: #555;
 }
+.cart-total-discount{
+    color: #15803d;
+}
 .cart-total hr{
     margin: 10px 0px;
 }
@@ -97,6 +100,25 @@ color: black;
     border: none;
     color: white;
     border-radius: 4px;
+    cursor: pointer;
+}
+.cart-promocode-message{
+    margin-top: 10px;
+    font-size: 14px;
+}
+.cart-promocode-message.success{
+    color: #15803d;
+}
+.cart-promocode-message.error{
+    color: #cc0000;
+}
+.cart-promocode-remove{
+    margin-top: 10px;
+    border: none;
+    background: transparent;
+    color: tomato;
+    cursor: pointer;
+    padding: 0;
 }
 
 @media (max-width:750px){

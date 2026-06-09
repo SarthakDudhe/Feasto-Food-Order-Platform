@@ -1,12 +1,29 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import "./Cart.css"
 import { StoreContext } from '../../context/StoreContext'
 import { useNavigate } from 'react-router-dom'
 const Cart = () => {
 
-const{food_list,cartItems,setCartItems,addToCart,removeFromCart,getTotalCartAmount,url} = useContext(StoreContext)
+const{food_list,cartItems,removeFromCart,getTotalCartAmount,getDeliveryFee,getCartDiscount,getFinalCartTotal,applyCoupon,removeCoupon,appliedCoupon,couponMessage,url} = useContext(StoreContext)
+const [couponInput,setCouponInput] = useState(appliedCoupon?.code || "")
 
 const navigate = useNavigate();
+
+const handleCouponSubmit = (event) => {
+  event.preventDefault();
+  applyCoupon(couponInput);
+}
+
+const handleRemoveCoupon = () => {
+  removeCoupon();
+  setCouponInput("");
+}
+
+const subtotal = getTotalCartAmount();
+const discount = getCartDiscount();
+const deliveryFee = getDeliveryFee();
+const total = getFinalCartTotal();
+
   return (
     <div className='cart'>
        <div className="cart-items">
@@ -46,17 +63,26 @@ if(cartItems[item._id] >0)
           <div>
             <div className="cart-total-details">
               <p>Subtotal</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>${subtotal}</p>
             </div>
             <hr />
+            {discount > 0 && (
+              <>
+                <div className="cart-total-details cart-total-discount">
+                  <p>Discount ({appliedCoupon.code})</p>
+                  <p>-${discount.toFixed(2)}</p>
+                </div>
+                <hr />
+              </>
+            )}
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() === 0? 0 : 2}</p>
+              <p>${deliveryFee}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>${getTotalCartAmount()===0 ? 0:getTotalCartAmount()+2}</b>
+              <b>${total.toFixed(2)}</b>
             </div>
             <hr />
           </div>
@@ -66,10 +92,12 @@ if(cartItems[item._id] >0)
         <div className="cart-promocode">
           <div>
             <p>If you have a promo code, Enter it here</p>
-            <div className='cart-promocode-input'>
-<input type="text" placeholder='promo code ' />
-<button>Submit</button>
-            </div>
+            <form className='cart-promocode-input' onSubmit={handleCouponSubmit}>
+<input type="text" placeholder='promo code ' value={couponInput} onChange={(event)=>setCouponInput(event.target.value)} />
+<button type="submit">Submit</button>
+            </form>
+            {couponMessage && <p className={`cart-promocode-message ${appliedCoupon ? "success" : "error"}`}>{couponMessage}</p>}
+            {appliedCoupon && <button className='cart-promocode-remove' onClick={handleRemoveCoupon}>Remove promo code</button>}
           </div>
         </div>
       </div>
