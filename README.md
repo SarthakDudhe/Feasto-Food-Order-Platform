@@ -100,12 +100,11 @@
 
 Use these placeholders if you want to turn the README into a more visual product page later.
 
-| Visual | Recommended Size |
+| Name | Visual |
 | --- | --- | 
 | Hero banner |  <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/3a3d620d-e931-44b1-9e6a-e0edb4a3b7fd" /> |
 | Cart screen |  <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/6d7e0ade-99b7-4a94-bf16-8ce811f55012" /> |
 | Checkout screen | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/171f2e71-9770-4fc6-b97f-db642deabc28" />| 
-
 | Admin item form | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/e7d9b26a-17d0-4471-b9bd-b75992175079" /> | 
 | Menu list table | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/e9e9ca13-3e47-4577-93e3-261cf5ab9108" /> | 
 | Orders page | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/01ef7719-e8f4-4163-8b9c-6cfa0dd954a5" /> | 
