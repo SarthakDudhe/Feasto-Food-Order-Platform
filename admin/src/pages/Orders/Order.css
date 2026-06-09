@@ -1,182 +1,129 @@
-/* ===============================
-   Root Theme
-================================ */
-:root {
-  --bg-main: #f6f8fc;
-  --row-bg: #ffffff;
-  --primary: #2563eb;
-  --success: #16a34a;
-  --warning: #f59e0b;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-light: #e5e7eb;
-  --shadow-soft: 0 8px 22px rgba(0, 0, 0, 0.05);
-}
-
-/* ===============================
-   Page Container
-================================ */
 .order.add {
-  padding: clamp(16px, 3vw, 32px);
-  background: var(--bg-main);
-  min-height: 100vh;
+  width: 100%;
+  padding: 18px 0 8px;
+  background: transparent;
+  min-height: auto;
 }
 
-/* ===============================
-   Title
-================================ */
-.order.add h3 {
-  font-size: clamp(20px, 2.5vw, 26px);
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: var(--text-main);
-}
-
-/* ===============================
-   List Container
-================================ */
 .order-list {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-/* ===============================
-   Horizontal Row
-================================ */
 .order-item {
   display: grid;
-  grid-template-columns:
-    48px           /* icon */
-    2.5fr          /* order info */
-    1fr            /* items count */
-    1fr            /* amount */
-    1.3fr;         /* status */
+  grid-template-columns: 54px minmax(0, 2.5fr) 1fr 1fr minmax(180px, 1fr);
   align-items: center;
   gap: 16px;
-  background: var(--row-bg);
-  padding: 16px 18px;
-  border-radius: 14px;
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-soft);
-  transition: background 0.2s ease, transform 0.2s ease;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 18px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .order-item:hover {
-  background: #f9fbff;
   transform: translateY(-2px);
+  box-shadow: 0 20px 36px rgba(76, 42, 31, 0.12);
 }
 
-/* ===============================
-   Icon
-================================ */
 .order-item img {
-  width: 42px;
-  height: 42px;
-  padding: 8px;
-  border-radius: 12px;
-  background: #eef2ff;
+  width: 44px;
+  height: 44px;
+  padding: 9px;
+  border-radius: 14px;
+  background: var(--accent-soft);
 }
 
-/* ===============================
-   Order Info Column
-================================ */
+.order-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .order-item-food {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.45;
 }
 
 .order-item-name {
   font-size: 14px;
-  font-weight: 700;
-  color: var(--primary);
+  font-weight: 800;
+  color: var(--accent-dark);
 }
 
 .order-item-address p {
   font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.4;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .order-item-phone {
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
 }
 
-/* ===============================
-   Meta Columns
-================================ */
 .order-item > p {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main);
+  font-weight: 700;
+  color: var(--text);
   text-align: center;
 }
 
-.order-item > p:nth-of-type(2) {
-  color: var(--success);
+.order-item > p b {
+  color: var(--muted);
+  font-weight: 800;
 }
 
-/* ===============================
-   Status Select
-================================ */
 .order-item select {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border-light);
-  background: #f8fafc;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: 0.2s;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .order-item select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: rgba(255, 90, 61, 0.35);
+  box-shadow: 0 0 0 4px rgba(255, 90, 61, 0.08);
 }
 
-/* ===============================
-   Tablet (≤ 1024px)
-================================ */
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .order-item {
-    grid-template-columns:
-      42px
-      3fr
-      1fr
-      1fr;
+    grid-template-columns: 48px minmax(0, 1fr);
   }
 
+  .order-item > p,
   .order-item select {
-    grid-column: 1 / -1;
-    margin-top: 10px;
+    grid-column: 2;
+    text-align: left;
   }
 }
 
-/* ===============================
-   Mobile (≤ 640px)
-================================ */
 @media (max-width: 640px) {
   .order-item {
     grid-template-columns: 1fr;
     gap: 12px;
-    padding: 14px;
+    padding: 16px;
   }
 
   .order-item img {
     justify-self: start;
   }
 
-  .order-item > p {
-    text-align: left;
-  }
-
+  .order-item > p,
   .order-item select {
-    width: 100%;
+    grid-column: 1;
+    text-align: left;
   }
 }

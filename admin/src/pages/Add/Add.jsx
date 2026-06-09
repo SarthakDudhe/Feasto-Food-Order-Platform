@@ -49,6 +49,11 @@ toast.error(response.data.message)
 
   return (
     <div className='add'>
+      <div className="page-intro">
+        <span className="page-intro-eyebrow">Menu management</span>
+        <h1>Add menu item</h1>
+        <p>Create a new food entry with image, description, category, and price for the live store.</p>
+      </div>
 <form className='flex-col' onSubmit={onSubmitHandler}>
 <div className="add-image-upload flex-col">
     <p>Upload Image</p>

@@ -1,60 +1,89 @@
 .sidebar {
-    width: 18%;
-    min-height: 100vh;
-    border-right: 1.5px solid #e5e5e5;
-    background: #ffffff;
-    font-size: max(1vw, 12px);
-    padding-top: 40px;
+    width: 250px;
+    min-height: calc(100vh - 160px);
+    padding: 18px;
+    margin-left: 0;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 98px;
 }
 
-/* options container */
 .sidebar-options {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding-left: 18%;
 }
 
-/* each option */
 .sidebar-option {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 12px 14px;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border-radius: 18px;
     cursor: pointer;
-    transition: 0.25s ease;
-    color: #444;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    color: var(--muted);
+    border: 1px solid transparent;
+    font-weight: 700;
 }
 
-/* icons */
 .sidebar-option img {
     width: 22px;
-    opacity: 0.8;
+    opacity: 0.82;
     transition: 0.2s ease;
 }
 
-/* hover */
 .sidebar-option:hover {
-    background: #f5f6f6;
-    transform: translateX(4px);
+    background: var(--accent-soft);
+    color: var(--text);
+    transform: translateX(2px);
 }
 
-/* active state */
 .sidebar-option.active {
-    background: #eef3ff;
-    color: #2b64ff;
-    font-weight: 600;
-    transform: translateX(4px);
-    border-left: 3px solid #2b64ff;
+    background: linear-gradient(135deg, var(--accent) 0%, #ff7453 100%);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 14px 26px rgba(255, 90, 61, 0.24);
 }
 
 .sidebar-option.active img {
     opacity: 1;
+    filter: brightness(0) invert(1);
 }
 
-@media (max-width:900px){
+@media (max-width: 1024px){
+    .sidebar{
+        width: 200px;
+    }
+
     .sidebar-option p{
         display: none;
+    }
+}
+
+@media (max-width: 700px){
+    .sidebar{
+        width: 100%;
+        margin: 0 4%;
+        min-height: auto;
+        position: static;
+    }
+
+    .sidebar-options{
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebar-option{
+        flex: 1 1 30%;
+        justify-content: center;
+    }
+
+    .sidebar-option p{
+        display: block;
+        font-size: 13px;
     }
 }

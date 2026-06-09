@@ -1,14 +1,86 @@
 .navbar{
+    position: sticky;
+    top: 14px;
+    z-index: 10;
+    margin: 18px 4% 0;
+    padding: 14px 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 4%;
+    border: 1px solid rgba(239, 220, 211, 0.92);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow);
+}
+
+.navbar-brand{
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
 .navbar .logo{
-    width: 90px;
+    width: 102px;
+}
+
+.navbar-title{
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+}
+
+.navbar-subtitle{
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.navbar-right{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.navbar-status{
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .navbar .profile{
-width: 50px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 90, 61, 0.2);
+    box-shadow: 0 10px 20px rgba(76, 42, 31, 0.1);
+}
+
+@media (max-width: 700px){
+    .navbar{
+        padding: 12px 14px;
+        border-radius: 20px;
+    }
+
+    .navbar .logo{
+        width: 88px;
+    }
+
+    .navbar-title{
+        font-size: 16px;
+    }
+
+    .navbar-subtitle{
+        display: none;
+    }
+
+    .navbar-status{
+        display: none;
+    }
 }

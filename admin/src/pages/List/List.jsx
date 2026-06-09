@@ -39,7 +39,11 @@ fetchList();
 
   return (
     <div className='list add flex-col'>
-      <p>All Foods List</p>
+      <div className="page-intro">
+        <span className="page-intro-eyebrow">Menu management</span>
+        <h1>Menu list</h1>
+        <p>Review all available dishes, inspect their category and price, and remove anything that needs updating.</p>
+      </div>
       <div className="list-table">
         <div className="list-table-format title">
     <b>Image</b> 
