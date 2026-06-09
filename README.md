@@ -646,10 +646,10 @@ If you plan to publish Feasto publicly, add a license file at the project root a
 
 > Replace these placeholders with your actual profile links before publishing.
 
-- **GitHub:** [Your GitHub profile](https://github.com/)
-- **LinkedIn:** [Your LinkedIn profile](https://www.linkedin.com/)
-- **Portfolio:** [Your portfolio website](https://your-portfolio.example)
-- **Email:** `you@example.com`
+- **GitHub:** [GitHub profile](https://github.com/SarthakDudhe)
+- **LinkedIn:** [LinkedIn profile](https://www.linkedin.com/in/sarthak-dudhe-67155a327)
+- **Portfolio:** [portfolio website](https://portfolio-sarthak-beta.vercel.app/)
+- **Email:** `sarthakdudhe79@gmail.com`
 
 <div align="center">
 
