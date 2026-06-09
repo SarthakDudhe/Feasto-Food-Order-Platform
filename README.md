@@ -102,17 +102,14 @@ Use these placeholders if you want to turn the README into a more visual product
 
 | Visual | Recommended Size |
 | --- | --- | 
-| Hero banner |  <img width="1600" height="600" alt="image" src="https://github.com/user-attachments/assets/3a3d620d-e931-44b1-9e6a-e0edb4a3b7fd" /> |
+| Hero banner |  <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/3a3d620d-e931-44b1-9e6a-e0edb4a3b7fd" /> |
+| Cart screen |  <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/6d7e0ade-99b7-4a94-bf16-8ce811f55012" /> |
+| Checkout screen | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/171f2e71-9770-4fc6-b97f-db642deabc28" />| 
 
-| Customer home screenshot | `1440 × 900` | Homepage hero, promo carousel, menu browser, and food cards |
-| Cart screen | `1440 × 900` | Cart table, promo code block, totals panel, checkout CTA |
-| Checkout screen | `1440 × 1100` | Delivery form, totals summary, and payment CTA |
-| AI assistant | `900 × 1200` | Gemini recipe assistant panel and sample recipe output |
-| Admin dashboard | `1440 × 900` | Navbar, sidebar, and premium control panel layout |
-| Add item form | `1440 × 1100` | Image upload, fields, category selector, and save action |
-| Menu list table | `1440 × 900` | Food inventory table with delete actions |
-| Orders page | `1440 × 1100` | Incoming orders, address details, and status dropdowns |
-| Architecture diagram | `1600 × 900` | Monorepo flow and backend integrations |
+| Admin item form | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/e7d9b26a-17d0-4471-b9bd-b75992175079" /> | 
+| Menu list table | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/e9e9ca13-3e47-4577-93e3-261cf5ab9108" /> | 
+| Orders page | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/01ef7719-e8f4-4163-8b9c-6cfa0dd954a5" /> | 
+
 
 ---
 
