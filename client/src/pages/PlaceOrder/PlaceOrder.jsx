@@ -71,6 +71,11 @@ if (!token) {
 
   return (
     <form onSubmit={placeOrder} className='place-order'>
+      <div className="page-intro place-order-intro">
+        <span className="page-intro-eyebrow">Warm premium diner</span>
+        <h1>Checkout details</h1>
+        <p>Fill in the delivery information and confirm your final total before payment.</p>
+      </div>
       <div className="place-order-left">
         <p className="title">Delivery Information</p>
         <div className="multi-fields">

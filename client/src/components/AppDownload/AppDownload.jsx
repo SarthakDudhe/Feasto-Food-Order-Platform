@@ -4,7 +4,7 @@ import "./AppDownload.css"
 const AppDownload = () => {
   return (
     <div className='app-download' id='app-download'>
-        <p>For better Experience Download <br /> Feasto App</p>
+        <p>For a smoother experience, download <br /> the Feasto app</p>
         <div className="app-download-plaforms">
             <img src={assets.play_store} alt="" />
             <img src={assets.app_store} alt="" />

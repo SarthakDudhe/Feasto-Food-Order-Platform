@@ -21,7 +21,11 @@ if (token) {
 
 return (
   <div className="my-orders">
-    <h2>My Orders</h2>
+    <div className="page-intro">
+      <span className="page-intro-eyebrow">Warm premium diner</span>
+      <h1>My orders</h1>
+      <p>Keep track of recent deliveries, order status, and what is already on the way.</p>
+    </div>
     <div className="container">
       {data.map((order) => {
         const itemsText = order.items

@@ -5,50 +5,44 @@ export default function Foodbot() {
   const [open, setOpen] = useState(false);
   const url = "https://feasto-backend-e0ic.onrender.com";
 
-  
   const [messages, setMessages] = useState([
-    { role: "bot", text: "Hi 👋 I’m Feasto AI. What are you craving today?" }
+    { role: "bot", text: "Hi, I'm Feasto AI. What are you craving today?" }
   ]);
   const [input, setInput] = useState("");
   const endRef = useRef(null);
 
-  // Auto scroll to bottom when new message appears
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send request to backend and fetch recipe
   const fetchRecipe = async (userQuery) => {
-    // Add loading placeholder
-    setMessages(m => [...m, { role: "bot", text: "Fetching your recipe... 🍳" }]);
+    setMessages(m => [...m, { role: "bot", text: "Fetching your recipe..." }]);
 
     try {
       const { data } = await axios.post(`${url}/api/ai/chat-recommend`, { inp_text: userQuery });
 
       if (!data.success) {
         setMessages(m => [
-          ...m.slice(0, -1), // remove placeholder
-          { role: "bot", text: "Sorry, I couldn't fetch recipes. 😅" }
+          ...m.slice(0, -1),
+          { role: "bot", text: "Sorry, I couldn't fetch recipes right now." }
         ]);
         return;
       }
 
-      const recipeText = data.data; // AI returns cleaned text with \n
+      const recipeText = data.data;
       setMessages(m => [
-        ...m.slice(0, -1), // remove placeholder
+        ...m.slice(0, -1),
         { role: "bot", text: recipeText }
       ]);
-
     } catch (error) {
       console.error(error);
       setMessages(m => [
         ...m.slice(0, -1),
-        { role: "bot", text: "Something went wrong while fetching recipes. ❌" }
+        { role: "bot", text: "Something went wrong while fetching recipes." }
       ]);
     }
   };
 
-  // Handle user input
   const send = async () => {
     if (!input.trim()) return;
 
@@ -60,14 +54,12 @@ export default function Foodbot() {
 
   return (
     <>
-      {/* Floating circular button */}
       {!open && (
         <button className="floating-chat-btn" onClick={() => setOpen(true)}>
-          🍴
+          ✦
         </button>
       )}
 
-      {/* Chat card */}
       {open && (
         <div className="feasto-chat-overlay">
           <div className="chat-card">
@@ -76,10 +68,9 @@ export default function Foodbot() {
                 <h3>Feasto AI</h3>
                 <p>Smart food assistant</p>
               </div>
-              <button onClick={() => setOpen(false)}>✕</button>
+              <button onClick={() => setOpen(false)}>×</button>
             </header>
 
-            {/* Chat messages */}
             <div className="chat-body">
               {messages.map((m, i) => (
                 <div
@@ -93,15 +84,14 @@ export default function Foodbot() {
               <div ref={endRef} />
             </div>
 
-            {/* Input */}
             <div className="chat-input">
               <input
-                placeholder="Ask for food recommendations…"
+                placeholder="Ask for food recommendations..."
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && send()}
               />
-              <button onClick={send}>➤</button>
+              <button onClick={send}>→</button>
             </div>
           </div>
         </div>
@@ -115,24 +105,26 @@ export default function Foodbot() {
           width: 60px;
           height: 60px;
           border-radius: 50%;
-          background: #ff4d4f;
+          background: linear-gradient(135deg, #ff5a3d 0%, #ff7a55 100%);
           color: white;
-          font-size: 28px;
+          font-size: 26px;
           border: none;
           cursor: pointer;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+          box-shadow: 0 14px 28px rgba(255, 90, 61, 0.28);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 1000;
-          transition: transform 0.2s;
+          transition: transform 0.2s, box-shadow 0.2s;
         }
-        .floating-chat-btn:hover { transform: scale(1.1); }
+        .floating-chat-btn:hover {
+          transform: translateY(-2px) scale(1.03);
+        }
 
         .feasto-chat-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.2);
+          background: rgba(26, 16, 13, 0.22);
           display: flex;
           justify-content: flex-end;
           align-items: flex-end;
@@ -141,67 +133,122 @@ export default function Foodbot() {
         }
 
         .chat-card {
-          width: 360px;
-          height: 520px;
-          background: white;
-          border-radius: 16px;
+          width: 380px;
+          height: 560px;
+          background: rgba(255, 255, 255, 0.96);
+          border-radius: 24px;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+          box-shadow: 0 24px 52px rgba(32, 19, 15, 0.2);
+          border: 1px solid var(--border);
           animation: slideIn 0.3s ease-out;
         }
-        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        @keyframes slideIn {
+          from { transform: translateY(100px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
 
         .chat-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 14px;
-          border-bottom: 1px solid #eee;
+          padding: 16px 18px;
+          border-bottom: 1px solid var(--border);
+          background: linear-gradient(135deg, #fff 0%, #fff6f1 100%);
+          border-radius: 24px 24px 0 0;
         }
-        .chat-header h3 { margin: 0; color: #ff4d4f; }
-        .chat-header button { border: none; background: none; font-size: 18px; cursor: pointer; }
+
+        .chat-header h3 {
+          margin: 0;
+          color: var(--text);
+        }
+
+        .chat-header p {
+          color: var(--muted);
+          font-size: 13px;
+          margin-top: 4px;
+        }
+
+        .chat-header button {
+          border: none;
+          background: var(--accent-soft);
+          color: var(--accent-dark);
+          width: 36px;
+          height: 36px;
+          border-radius: 999px;
+          font-size: 20px;
+          cursor: pointer;
+        }
 
         .chat-body {
           flex: 1;
           padding: 14px;
           overflow-y: auto;
-          background: #fafafa;
+          background:
+            radial-gradient(circle at top right, rgba(255, 90, 61, 0.06), transparent 30%),
+            linear-gradient(180deg, #fffdfb 0%, #fff7f3 100%);
           display: flex;
           flex-direction: column;
           gap: 10px;
         }
+
         .bubble {
           max-width: 80%;
           padding: 10px 12px;
-          border-radius: 14px;
+          border-radius: 16px;
           font-size: 14px;
+          line-height: 1.5;
         }
-        .bubble.bot { background: #fff; border: 1px solid #eee; }
-        .bubble.user { align-self: flex-end; background: #ff4d4f; color: white; }
+
+        .bubble.bot {
+          background: #fff;
+          border: 1px solid var(--border);
+          box-shadow: 0 8px 18px rgba(76, 42, 31, 0.06);
+          color: var(--text);
+        }
+
+        .bubble.user {
+          align-self: flex-end;
+          background: linear-gradient(135deg, var(--accent) 0%, #ff7453 100%);
+          color: white;
+          box-shadow: 0 12px 22px rgba(255, 90, 61, 0.22);
+        }
 
         .chat-input {
           display: flex;
           gap: 8px;
           padding: 12px;
-          border-top: 1px solid #eee;
+          border-top: 1px solid var(--border);
+          background: rgba(255, 255, 255, 0.94);
+          border-radius: 0 0 24px 24px;
         }
+
         .chat-input input {
           flex: 1;
-          padding: 10px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
+          padding: 12px 14px;
+          border-radius: 14px;
+          border: 1px solid var(--border);
+          outline: none;
+          background: #fff;
         }
+
         .chat-input button {
-          background: #ff4d4f;
+          min-width: 52px;
+          background: var(--text);
           color: white;
           border: none;
-          border-radius: 10px;
+          border-radius: 14px;
           padding: 0 14px;
+          font-size: 18px;
         }
 
         @media (max-width: 600px) {
-          .chat-card { width: 100%; height: 100%; border-radius: 0; }
+          .chat-card {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+          }
         }
       `}</style>
     </>

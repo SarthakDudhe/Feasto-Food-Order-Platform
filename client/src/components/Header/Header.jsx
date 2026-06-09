@@ -8,11 +8,20 @@ const Header = () => {
         <video className="bg-video" autoPlay loop muted playsInline>
           <source src={assets.dishes2} type="video/mp4" />
         </video>
-<div className="header-contents">
-    <h2>Order your favourite food here</h2>
-    <p>Choose from a diverse menu featuring a delectable array of dishes crafted with the finest ingredients and culinary expertise. Our mission is to satisfy your cravings and elevate your dining experience, one delicious meal at a time.</p>
-    <button>View Menu</button>
-</div>
+        <div className="header-overlay"></div>
+        <div className="header-contents">
+            <span className="header-eyebrow">Warm premium diner</span>
+            <h2>Order your favourite food here</h2>
+            <p>Choose from a diverse menu featuring a delectable array of dishes crafted with the finest ingredients and culinary expertise. Our mission is to satisfy your cravings and elevate your dining experience, one delicious meal at a time.</p>
+            <div className="header-actions">
+              <button>View Menu</button>
+              <div className="header-pills" aria-label="Highlights">
+                <span>Freshly made</span>
+                <span>Fast checkout</span>
+                <span>Promo ready</span>
+              </div>
+            </div>
+        </div>
     </div>
   )
 }

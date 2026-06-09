@@ -1,81 +1,147 @@
 .header {
     position: relative;
-    height: 34vw;
-    margin: 30px auto;
-    overflow: hidden;  /* Important to hide overflow */
-    border-radius: 10px;
+    min-height: min(74vh, 760px);
+    margin: 16px auto 28px;
+    overflow: hidden;
+    border-radius: 30px;
+    border: 1px solid rgba(239, 220, 211, 0.92);
+    background: #261513;
+    box-shadow: 0 26px 60px rgba(53, 27, 19, 0.18);
 }
 
-/* Background video */
 .bg-video {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;    /* Fills the entire header */
-    transform: translate(-50%, -50%);
-    z-index: -1;          /* Push video behind text */
+    object-fit: cover;
+    z-index: 0;
+    transform: scale(1.03);
 }
 
-/* Content remains the same */
+.header-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(90deg, rgba(25, 16, 13, 0.88) 0%, rgba(25, 16, 13, 0.66) 42%, rgba(255, 90, 61, 0.16) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.28) 100%);
+}
+
 .header-contents {
     position: absolute;
+    z-index: 2;
+    left: clamp(20px, 5vw, 72px);
+    bottom: clamp(20px, 6vw, 72px);
     display: flex;
     flex-direction: column;
-    align-items: start;
-    gap: 1.5vw;
-    max-width: 50%;
-    bottom: 10%;
-    left: 6vw;
-    color: white;          /* Important for visibility */
-    z-index: 5;            /* Above the video */
-    animation:fadeIn 3s;
+    gap: 16px;
+    max-width: min(560px, 58%);
+    color: white;
+    animation: fadeIn 1.2s ease;
 }
 
-/* Optional: styling */
+.header-eyebrow {
+    width: fit-content;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.84);
+}
+
 .header-contents h2 {
     color: white;
-    font-weight: 500;
-font-size: max(4.5vw,22px);
+    font-weight: 800;
+    font-size: clamp(42px, 5.6vw, 78px);
+    line-height: 0.95;
+    max-width: 11ch;
 }
 
 .header-contents p {
-    font-size: 1.1vw;
+    font-size: clamp(15px, 1.25vw, 18px);
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.86);
+    max-width: 56ch;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 4px;
 }
 
 .header-contents button {
-    padding: 0.8vw 2vw;
-    background: whitesmoke;
+    padding: 14px 26px;
+    background: linear-gradient(135deg, #ffffff 0%, #ffe8e1 100%);
     border: none;
-    border-radius: 50px;
-    color: white;
-    font-size: 1.1vw;
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.3s;
-    color: black;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 16px 30px rgba(255, 255, 255, 0.18);
 }
 
 .header-contents button:hover {
-    background: #ff3333;
+    transform: translateY(-2px);
+    box-shadow: 0 20px 34px rgba(255, 255, 255, 0.24);
 }
-@media (max-width:1050px){
 
+.header-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.header-pills span {
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1050px){
     .header-contents{
-        max-width: 45%;
+        max-width: 70%;
+    }
+
+    .header-contents h2{
+        max-width: 13ch;
     }
 }
 
-
-@media (max-width:750px){
- 
-    .header-contents{
-        max-width: 65%;
+@media (max-width: 750px){
+    .header {
+        min-height: 620px;
+        border-radius: 24px;
+        margin-top: 12px;
     }
+
+    .header-contents{
+        max-width: calc(100% - 40px);
+    }
+
     .header-contents p{
-        display: none;
+        max-width: 100%;
     }
+
+    .header-actions{
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .header-contents button{
-        padding: 2vw 4vw;
+        width: 100%;
     }
 }

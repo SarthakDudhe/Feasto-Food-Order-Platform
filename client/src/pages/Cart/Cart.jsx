@@ -26,6 +26,10 @@ const total = getFinalCartTotal();
 
   return (
     <div className='cart'>
+      <div className="page-intro">
+        <h1>Your cart</h1>
+        <p>Review your dishes, apply a promo code, and move into checkout when the order feels right.</p>
+      </div>
        <div className="cart-items">
         <div className="cart-items-title">
           <p>Items</p>
