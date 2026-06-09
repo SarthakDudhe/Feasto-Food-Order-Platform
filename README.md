@@ -36,19 +36,6 @@
 </p>
 
 </div>
-
----
-
-## Live Demo & Deployment Status
-
-> Replace these placeholders with your actual deployed URLs when you publish the project.
-
-| Surface | Placeholder URL | Notes |
-| --- | --- | --- |
-| Customer app | `https://your-customer-demo.example` | Customer ordering experience |
-| Admin app | `https://your-admin-demo.example` | Operational management console |
-| Backend API | `https://feasto-backend-e0ic.onrender.com` | Current backend URL referenced in the code |
-
 ---
 
 ## What Feasto Does
