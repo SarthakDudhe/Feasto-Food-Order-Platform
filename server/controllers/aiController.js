@@ -1,60 +1,70 @@
-import {GoogleGenAI} from "@google/genai"
-import { extractContext } from "../utils/helper.js"
-import {RecipePrompt } from "../prompt/Foodprompt.js";
-const ai = new GoogleGenAI({apiKey:process.env.GEMINI_API_KEY});
+import { GoogleGenAI } from "@google/genai";
+import { GeminiChatPrompt } from "../prompt/Foodprompt.js";
+import foodModel from "../models/foodModel.js";
 
-// export const generateRecommendations = async (req,res) => {
-//     try {
-//         const {inp_text} = req.body;
-//         const { weather,timeOfDay,diet,maxPrice} = extractContext(inp_text);
-
-//         const prompt = RecommendPrompt( weather,timeOfDay,diet,maxPrice);
-
-//         const response = await ai.models.generateContent({
-//             model:"gemini-3-flash-preview",
-//              contents: prompt,
-//         })
-
-//         return res.json({success:true,response});
-
-
-//     } catch (error) {
-        
-//     }
-// }
-
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const generateRecommendations = async (req, res) => {
   try {
     const { inp_text } = req.body;
 
-    const {foodItem} = extractContext(inp_text);
-
-    const prompt = RecipePrompt(foodItem);
+    const prompt = GeminiChatPrompt(inp_text);
 
     const aiResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
     });
 
-    // 4️⃣ Extract only the recipe text
-    const text =
-      aiResponse?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    const text = aiResponse?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
     if (!text) {
-      return res.status(404).json({
+      return res.json({
         success: false,
-        message: "No recipe found for this dish.",
+        message: "Unable to generate a response."
       });
     }
 
-    return res.json({
-      success: true,
-      data: text, // clean array
-    });
+    let cleanedText = text;
+    // Strip markdown codeblock if present
+    if (cleanedText.includes("```")) {
+      const match = cleanedText.match(/```(?:json)?([\s\S]*?)```/);
+      if (match && match[1]) {
+        cleanedText = match[1].trim();
+      } else {
+        cleanedText = cleanedText.replace(/```/g, "").trim();
+      }
+    }
+
+    try {
+      const parsed = JSON.parse(cleanedText);
+      
+      let matchedItems = [];
+      if (parsed.intent === "recommend" && parsed.recommendedItems && parsed.recommendedItems.length > 0) {
+        // Find matching food items in the database by exact name (case-insensitive for safety)
+        const regexNames = parsed.recommendedItems.map(name => new RegExp(`^${name.trim()}$`, "i"));
+        matchedItems = await foodModel.find({ name: { $in: regexNames } });
+      }
+
+      return res.json({
+        success: true,
+        intent: parsed.intent,
+        message: parsed.message,
+        items: matchedItems
+      });
+
+    } catch (parseError) {
+      console.error("JSON parsing error for Gemini output:", parseError, text);
+      // Fallback response: treat the whole text as chat message
+      return res.json({
+        success: true,
+        intent: "chat",
+        message: text,
+        items: []
+      });
+    }
 
   } catch (error) {
-    console.error(error);
+    console.error("aiController error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to generate recommendations",

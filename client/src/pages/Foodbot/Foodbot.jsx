@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios";
+import { StoreContext } from "../../context/StoreContext";
 
 export default function Foodbot() {
   const [open, setOpen] = useState(false);
-  const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  const { url, addToCart, cartItems } = useContext(StoreContext);
 
   const [messages, setMessages] = useState([
     { role: "bot", text: "Hi, I'm Feasto AI. What are you craving today?" }
@@ -15,8 +16,8 @@ export default function Foodbot() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const fetchRecipe = async (userQuery) => {
-    setMessages(m => [...m, { role: "bot", text: "Fetching your recipe..." }]);
+  const fetchBotResponse = async (userQuery) => {
+    setMessages(m => [...m, { role: "bot", text: "Feasto AI is thinking..." }]);
 
     try {
       const { data } = await axios.post(`${url}/api/ai/chat-recommend`, { inp_text: userQuery });
@@ -24,21 +25,25 @@ export default function Foodbot() {
       if (!data.success) {
         setMessages(m => [
           ...m.slice(0, -1),
-          { role: "bot", text: "Sorry, I couldn't fetch recipes right now." }
+          { role: "bot", text: "Sorry, I couldn't fetch recommendations right now." }
         ]);
         return;
       }
 
-      const recipeText = data.data;
       setMessages(m => [
         ...m.slice(0, -1),
-        { role: "bot", text: recipeText }
+        { 
+          role: "bot", 
+          text: data.message, 
+          intent: data.intent, 
+          items: data.items 
+        }
       ]);
     } catch (error) {
       console.error(error);
       setMessages(m => [
         ...m.slice(0, -1),
-        { role: "bot", text: "Something went wrong while fetching recipes." }
+        { role: "bot", text: "Something went wrong. Please try again." }
       ]);
     }
   };
@@ -49,7 +54,7 @@ export default function Foodbot() {
     const userMsg = input;
     setInput("");
     setMessages(m => [...m, { role: "user", text: userMsg }]);
-    await fetchRecipe(userMsg);
+    await fetchBotResponse(userMsg);
   };
 
   return (
@@ -73,12 +78,35 @@ export default function Foodbot() {
 
             <div className="chat-body">
               {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`bubble ${m.role}`}
-                  style={m.role === "bot" ? { whiteSpace: "pre-line" } : {}}
-                >
-                  {m.text}
+                <div key={i} className="message-wrapper">
+                  <div
+                    className={`bubble ${m.role}`}
+                    style={m.role === "bot" ? { whiteSpace: "pre-line" } : {}}
+                  >
+                    {m.text}
+                  </div>
+                  {m.role === "bot" && m.items && m.items.length > 0 && (
+                    <div className="bot-recommendations">
+                      {m.items.map((item) => {
+                        const inCartCount = cartItems[item._id] || 0;
+                        return (
+                          <div key={item._id} className="recommend-card">
+                            <img src={url + "/images/" + item.image} alt={item.name} className="recommend-item-img" />
+                            <div className="recommend-item-info">
+                              <h4 className="recommend-item-name">{item.name}</h4>
+                              <p className="recommend-item-price">${item.price}</p>
+                            </div>
+                            <button 
+                              className={`btn-add-recommend ${inCartCount > 0 ? "added" : ""}`}
+                              onClick={() => addToCart(item._id)}
+                            >
+                              {inCartCount > 0 ? `Added (${inCartCount})` : "Add +"}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               ))}
               <div ref={endRef} />
@@ -130,6 +158,7 @@ export default function Foodbot() {
           align-items: flex-end;
           padding: 16px;
           z-index: 1000;
+          pointer-events: none;
         }
 
         .chat-card {
@@ -142,6 +171,7 @@ export default function Foodbot() {
           box-shadow: 0 24px 52px rgba(32, 19, 15, 0.2);
           border: 1px solid var(--border);
           animation: slideIn 0.3s ease-out;
+          pointer-events: auto;
         }
 
         @keyframes slideIn {
@@ -193,6 +223,13 @@ export default function Foodbot() {
           gap: 10px;
         }
 
+        .message-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          width: 100%;
+        }
+
         .bubble {
           max-width: 80%;
           padding: 10px 12px;
@@ -206,6 +243,7 @@ export default function Foodbot() {
           border: 1px solid var(--border);
           box-shadow: 0 8px 18px rgba(76, 42, 31, 0.06);
           color: var(--text);
+          align-self: flex-start;
         }
 
         .bubble.user {
@@ -213,6 +251,100 @@ export default function Foodbot() {
           background: linear-gradient(135deg, var(--accent) 0%, #ff7453 100%);
           color: white;
           box-shadow: 0 12px 22px rgba(255, 90, 61, 0.22);
+        }
+
+        .bot-recommendations {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          padding: 4px 4px 10px;
+          margin-top: 2px;
+          max-width: 100%;
+          scrollbar-width: thin;
+          scrollbar-color: var(--border) transparent;
+          align-self: flex-start;
+        }
+
+        .bot-recommendations::-webkit-scrollbar {
+          height: 6px;
+        }
+
+        .bot-recommendations::-webkit-scrollbar-thumb {
+          background-color: var(--border);
+          border-radius: 99px;
+        }
+
+        .recommend-card {
+          flex: 0 0 150px;
+          background: #ffffff;
+          border: 1px solid var(--border);
+          border-radius: 18px;
+          padding: 8px;
+          box-shadow: 0 6px 12px rgba(76, 42, 31, 0.04);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .recommend-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(76, 42, 31, 0.08);
+        }
+
+        .recommend-item-img {
+          width: 80px;
+          height: 80px;
+          border-radius: 12px;
+          object-fit: cover;
+          margin-bottom: 8px;
+          border: 1px solid var(--border);
+        }
+
+        .recommend-item-info {
+          width: 100%;
+          margin-bottom: 8px;
+        }
+
+        .recommend-item-name {
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--text);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin: 0 0 2px 0;
+        }
+
+        .recommend-item-price {
+          font-size: 12px;
+          font-weight: 800;
+          color: var(--accent-dark);
+          margin: 0;
+        }
+
+        .btn-add-recommend {
+          width: 100%;
+          padding: 6px 10px;
+          border: 1px solid rgba(255, 90, 61, 0.18);
+          border-radius: 99px;
+          background: var(--accent-soft);
+          color: var(--accent-dark);
+          font-size: 12px;
+          font-weight: 800;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-add-recommend:hover {
+          background: #ffe1d8;
+        }
+
+        .btn-add-recommend.added {
+          background: #e8fcf6;
+          color: #0f8b6d;
+          border-color: rgba(46, 196, 182, 0.15);
         }
 
         .chat-input {
@@ -241,6 +373,7 @@ export default function Foodbot() {
           border-radius: 14px;
           padding: 0 14px;
           font-size: 18px;
+          cursor: pointer;
         }
 
         @media (max-width: 600px) {
