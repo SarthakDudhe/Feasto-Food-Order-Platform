@@ -12,8 +12,17 @@ const[data,setData]=useState([]);
 const navigate = useNavigate();
 
 const fetchOrders = async () => {
-    const response = await axios.post(url+"/api/order/userOrders",{},{headers:{token}})
-    setData(response.data.data)
+    try {
+        const response = await axios.post(url+"/api/order/userOrders",{},{headers:{token}})
+        if (response.data && response.data.success && response.data.data) {
+            setData(response.data.data)
+        } else {
+            setData([])
+        }
+    } catch (err) {
+        console.error("Error fetching orders:", err)
+        setData([])
+    }
 }
 
 useEffect(()=>{
@@ -30,28 +39,32 @@ return (
       <p>Keep track of recent deliveries, order status, and what is already on the way.</p>
     </div>
     <div className="container">
-      {data.map((order) => {
-        const itemsText = order.items
-          .map((item) => `${item.name} x ${item.quantity}`)
-          .join(", ");
+      {data && data.length > 0 ? (
+        data.map((order) => {
+          const itemsText = order.items
+            ? order.items.map((item) => `${item.name} x ${item.quantity}`).join(", ")
+            : "";
 
-        return (
-          <div key={order.id || order._id || order.amount} className="my-orders-order">
-            <img src={assets.parcel_icon} alt="Parcel icon" />
+          return (
+            <div key={order.id || order._id || order.amount} className="my-orders-order">
+              <img src={assets.parcel_icon} alt="Parcel icon" />
 
-            <p>{itemsText}</p>
-            <p>${order.amount.toFixed(2)}</p>
-            <p>Items: {order.items.length}</p>
+              <p>{itemsText}</p>
+              <p>${order.amount.toFixed(2)}</p>
+              <p>Items: {order.items ? order.items.length : 0}</p>
 
-            {/* bullet point using Unicode */}
-            <p>
-             <span className='dot'>&#x25CF;</span>  <b>{order.status}</b>
-            </p>
+              {/* bullet point using Unicode */}
+              <p>
+               <span className='dot'>&#x25CF;</span>  <b>{order.status}</b>
+              </p>
 
-            <button onClick={() => navigate(`/track-order/${order._id}`)}>Track Order</button>
-          </div>
-        );
-      })}
+              <button onClick={() => navigate(`/track-order/${order._id}`)}>Track Order</button>
+            </div>
+          );
+        })
+      ) : (
+        <p className="no-orders-message">You have no active or completed orders.</p>
+      )}
     </div>
   </div>
 );
