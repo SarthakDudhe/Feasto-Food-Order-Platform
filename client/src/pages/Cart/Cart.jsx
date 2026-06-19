@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import "./Cart.css"
 import { StoreContext } from '../../context/StoreContext'
 import { useNavigate } from 'react-router-dom'
+import ScratchCard from '../../components/ScratchCard/ScratchCard'
 const Cart = () => {
 
 const{food_list,cartItems,removeFromCart,getTotalCartAmount,getDeliveryFee,getCartDiscount,getFinalCartTotal,applyCoupon,removeCoupon,appliedCoupon,couponMessage,url} = useContext(StoreContext)
@@ -97,11 +98,22 @@ if(cartItems[item._id] >0)
           <div>
             <p>If you have a promo code, Enter it here</p>
             <form className='cart-promocode-input' onSubmit={handleCouponSubmit}>
-<input type="text" placeholder='promo code ' value={couponInput} onChange={(event)=>setCouponInput(event.target.value)} />
-<button type="submit">Submit</button>
+              <input type="text" placeholder='promo code ' value={couponInput} onChange={(event)=>setCouponInput(event.target.value)} />
+              <button type="submit">Submit</button>
             </form>
             {couponMessage && <p className={`cart-promocode-message ${appliedCoupon ? "success" : "error"}`}>{couponMessage}</p>}
             {appliedCoupon && <button className='cart-promocode-remove' onClick={handleRemoveCoupon}>Remove promo code</button>}
+            
+            {!appliedCoupon && (
+              <>
+                <hr style={{ margin: "20px 0 16px", border: "0", borderTop: "1px dashed var(--border)" }} />
+                <p style={{ fontSize: "14px", color: "var(--muted)", fontWeight: "600", marginBottom: "8px" }}>Don't have a code? Scratch to win a secret coupon! 🎁</p>
+                <ScratchCard onReveal={(code) => {
+                  setCouponInput(code);
+                  applyCoupon(code);
+                }} />
+              </>
+            )}
           </div>
         </div>
       </div>
