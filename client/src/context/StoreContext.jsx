@@ -113,29 +113,43 @@ const removeCoupon = () => {
 }
 
 const fetchFoodList = async () => {
-    const response = await axios.get(`${url}/api/food/list`)
-    setFoodList(response.data.data)
+    try {
+        const response = await axios.get(`${url}/api/food/list`)
+        if (response.data && response.data.success) {
+            setFoodList(response.data.data)
+        } else {
+            setFoodList([])
+        }
+    } catch (error) {
+        console.error("Failed to fetch food list:", error);
+        setFoodList([])
+    }
 }
 
 const loadCartData = async (token) => {
-    const response = await axios.post(url+"/api/cart/get",{},{headers:{token}})
-    setCartItems(response.data.cartData)
+    try {
+        const response = await axios.post(url+"/api/cart/get",{},{headers:{token}})
+        if (response.data && response.data.success && response.data.cartData) {
+            setCartItems(response.data.cartData)
+        } else {
+            setCartItems({})
+        }
+    } catch (error) {
+        console.error("Failed to load cart data:", error);
+        setCartItems({})
+    }
 }
 
-
 useEffect(() => {
-  
-
   async function loadData() {
     await fetchFoodList()
-      if (localStorage.getItem("token")) {
-   setToken( localStorage.getItem("token"))
-   await loadCartData(localStorage.getItem("token"))
-  }
+    if (localStorage.getItem("token")) {
+      setToken(localStorage.getItem("token"))
+      await loadCartData(localStorage.getItem("token"))
+    }
   }
   loadData();
 }, [])
-
 
 
 useEffect(() => {
