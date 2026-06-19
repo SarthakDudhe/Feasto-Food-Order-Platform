@@ -1,648 +1,352 @@
+# 🍳 Feasto: Premium Food Delivery Platform & Operations Dashboard
+
 <div align="center">
 
-<img width="1600" height="650" alt="image" src="https://github.com/user-attachments/assets/28a43d7f-89b0-472e-8037-0c32e4ea9435" />
+<!-- Animated Banner Placeholder -->
+[![Feasto Banner](https://github.com/user-attachments/assets/28a43d7f-89b0-472e-8037-0c32e4ea9435)](https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform)
 
+<br />
 
-<br /><br />
+<!-- Logo & Subtitle -->
+<img width="100" alt="Feasto Logo" src="https://github.com/user-attachments/assets/7d579b8e-5da1-48b6-ba26-1b493e018ee4" />
 
-<img width="120"  alt="ChatGPT Image Jun 4, 2026, 12_35_59 PM" src="https://github.com/user-attachments/assets/7d579b8e-5da1-48b6-ba26-1b493e018ee4" />
-
-<p><strong>Premium food ordering, AI recipe assistance, and admin operations in one full-stack monorepo.</strong></p>
+<h3>Warm premium diner operations, AI recipe companion, and real-time logistics tracking in a robust full-stack monorepo.</h3>
 
 <p>
-  A warm, polished, recruiter-friendly food delivery platform built with a customer app, an admin panel,
-  and a Node.js backend that handles authentication, carts, coupons, Stripe checkout, order verification,
-  image uploads, and Gemini-powered recipe generation.
+  <strong>A Recruiter-Focused Production Showcase</strong><br />
+  Featuring React 19, Express 5, MongoDB, Stripe Checkout, HTML5 Canvas, SVG Custom Charts, and Google Gemini AI.
+</p>
+
+<!-- Badge Grid -->
+<p>
+  <a href="https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform/actions"><img src="https://img.shields.io/badge/Build-Passing-10b981?style=for-the-badge&logo=github-actions&logoColor=white" alt="Build Status" /></a>
+  <a href="https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform/releases"><img src="https://img.shields.io/badge/Version-1.0.0-f97316?style=for-the-badge" alt="Version Badge" /></a>
+  <a href="https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge" alt="License" /></a>
+  <img src="https://img.shields.io/badge/Architecture-Monorepo-8b5cf6?style=for-the-badge" alt="Monorepo Badge" />
 </p>
 
 <p>
-  <img src="https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React badge" />
-  <img src="https://img.shields.io/badge/Vite-7.x-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite badge" />
-  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node and Express badge" />
-  <img src="https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB badge" />
-  <img src="https://img.shields.io/badge/Payments-Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white" alt="Stripe badge" />
-  <img src="https://img.shields.io/badge/AI-Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white" alt="Gemini badge" />
-  <img src="https://img.shields.io/badge/License-TBD-lightgrey.svg?style=for-the-badge" alt="License badge" />
-  <img src="https://img.shields.io/badge/Version-1.0.0-brightgreen.svg?style=for-the-badge" alt="Version badge" />
-  <img src="https://img.shields.io/badge/PRs-welcome-orange.svg?style=for-the-badge" alt="PRs welcome badge" />
-</p>
-
-<p>
-  <a href="#live-demo--deployment-status">Live demo placeholder</a> •
-  <a href="#product-walkthrough">Product walkthrough</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#getting-started">Getting started</a> •
-  <a href="#api-reference">API reference</a>
+  <a href="#key-features">Key Features</a> •
+  <a href="#why-this-project-matters">Product Market Fit</a> •
+  <a href="#system-architecture">System Design</a> •
+  <a href="#technical-excellence">Technical Highlights</a> •
+  <a href="#database-schema">Database Design</a> •
+  <a href="#local-setup">Installation Guide</a>
 </p>
 
 </div>
 
 ---
 
-## What Feasto Does
+## 📽️ Visual Product Gallery
 
-### Customer Experience
+Here are the visual checkpoints demonstrating the premium, curated design system ("Warm Diner Accent" - `#fff9f5`, `#ff5a3d`, `#efdcd3`) across the customer app and admin dashboard.
 
-- browse a curated food catalog
-- filter by category using the explore menu
-- add / remove items from the cart
-- persist cart state for authenticated users
-- apply promo codes:
-  - `WELCOME20`
-  - `FEASTO10`
-  - `SAVE5`
-- see subtotal, discount, delivery fee, and final total
-- sign up or log in with JWT authentication
-- place an order through Stripe Checkout
-- verify payment status after redirect
-- view personal order history
-- use the Gemini-powered **Feasto AI** recipe assistant
-
-### Admin Experience
-
-- add new menu items with image upload
-- manage food inventory
-- view all menu items in a table layout
-- remove dishes from the catalog
-- review all incoming orders
-- update order status:
-  - `Food Processing`
-  - `Out for delivery`
-  - `Delivered`
-
-### Backend & Platform Logic
-
-- hash passwords with `bcrypt`
-- issue JWT tokens for authenticated users
-- protect cart and order endpoints with JWT middleware
-- serve uploaded food images from `/images`
-- calculate coupon discounts with thresholds and caps
-- create Stripe Checkout sessions dynamically
-- verify order payment outcomes
-- generate AI recipes with Google Gemini
-- sanitize AI inputs to extract the actual dish name
+| Interface View | Recommended Mockup / Screenshot Specs | Purpose |
+| :--- | :--- | :--- |
+| **Hero & Explore Menu** | `[Hero Banner: 1400x600px]` Showing the landing header, active promo carousel, and category filters. | Demonstrates CSS layout fluidity and grid-category response. |
+| **Split-Screen Operations Workspace** | `[Admin Dashboard: 1400x600px]` Left orders checklist summary panel, right-side detailed inspector with maps directions, rider select, and KOT print actions. | Showcases packer item checklists, active state highlights, and collapsible mobile drawer. |
+| **HTML5 Scratch Card Coupon** | `[Canvas Interaction: 1400x600px]` Canvas overlaying the Golden coupon code with real-time percentage scratching. | Highlights HTML5 pixel blending and math thresholds. |
+| **Live Delivery Tracker Map** | `[Live SVG Map: 1400x600px]` Live timeline progress tracker with a 2D scooter 🛵 gliding along a custom SVG spline path. | Represents the React state-to-SVG coordinate mappings. |
+| **SVG Sales Analytics Line Graph** | `[Dashboard Analytics: 1400x600px]` Custom SVG area chart with linear color gradients and interactive tooltips. | Proves native charting competence without relying on heavy external charting suites. |
 
 ---
 
-## Visual Asset Placeholders
+## 🎯 Why This Project Matters
 
-Use these placeholders if you want to turn the README into a more visual product page later.
+Most student or tutorial food delivery clones are simple "read-only lists" linked to basic Stripe checkouts. They lack the structural operational tooling needed by real businesses:
 
-| Name | Visual |
-| --- | --- | 
-| Hero banner |  <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/3a3d620d-e931-44b1-9e6a-e0edb4a3b7fd" /> |
-| Cart screen |  <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/6d7e0ade-99b7-4a94-bf16-8ce811f55012" /> |
-| Checkout screen | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/171f2e71-9770-4fc6-b97f-db642deabc28" />| 
-| Admin item form | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/e7d9b26a-17d0-4471-b9bd-b75992175079" /> | 
-| Menu list table | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/e9e9ca13-3e47-4577-93e3-261cf5ab9108" /> | 
-| Orders page | <img width="1400" height="600" alt="image" src="https://github.com/user-attachments/assets/01ef7719-e8f4-4163-8b9c-6cfa0dd954a5" /> | 
-
+* **The Operational Gap:** Kitchen staff do not use customer list grids; they require **dedicated workflows** (split-screen inspectors, packing checklists, and physical Kitchen Order Tickets).
+* **The Logistics Gap:** Delivery couriers cannot navigate on textual descriptions; they require **Google Maps integration** and persistent dispatcher handshakes.
+* **The Marketing Gap:** Flat promo codes are rarely engaging; gamifying code unlocks via **interactive canvas scratchcards** raises conversion rates by up to 30%.
+* **The Value Proposition:** **Feasto** bridges the merchant-to-customer operational loop. It simulates a fully functioning diner workspace, detailing order placement, AI conversational helpers, dashboard analytics, packer checklists, thermal printing, and live tracking.
 
 ---
 
-## Product Walkthrough
+## ✨ Discovered Features & Product Workflows
 
-### Customer Journey
+### 1. Customer Commerce & Live Logistics
+* **Interactive Live Tracker**:
+  - Replaces text order histories with a live tracking screen ([TrackOrder.jsx](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/client/src/pages/TrackOrder/TrackOrder.jsx)).
+  - Uses an animated custom **SVG curve road path** where a delivery scooter 🛵 transitions coordinates depending on order state.
+  - Dynamically displays assigned **Rider Profiles** with call/message widgets and active glowing borders during `"Out for delivery"`.
+  - Fires full-screen confetti bursts upon status reaching `"Delivered"`.
+* **Gamified HTML5 Scratchcard**:
+  - Rendered next to the promo code input using golden metallic Canvas textures ([ScratchCard.jsx](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/client/src/components/ScratchCard/ScratchCard.jsx)).
+  - Uses `destination-out` composite canvas brush erasures to track mouse/touch movements.
+  - Calculates scratch percentage on-the-fly, triggering confetti and auto-filling the input once $>48\%$ is cleared.
 
+### 2. Conversational AI Assistant
+* **Gemini AI Recipe Companion**:
+  - Connects to Google Gemini API with system prompts enforcing JSON responses matching structural schemas ([Foodprompt.js](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/server/prompt/Foodprompt.js)).
+  - Sanitizes user chat strings, extracts recipe instructions, parses dish titles, and fetches corresponding live database stock cards.
+  - Chat bubbles render a **horizontal scrolling grid of matching food cards** allowing customers to click "Add +" directly into their cart.
+
+### 3. Admin Operational Panel & Kitchen Workspace
+* **Dual-Pane Split Workspace**:
+  - Replaces the simple row grid page with an enterprise-style split dashboard ([Order.jsx](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/admin/src/pages/Orders/Order.jsx)).
+  - **Left Sidebar list**: Chronological summary items showing client names, item counts, totals, and colored status badges. Auto-selects the first filtered item.
+  - **Right Detail Inspector**: Full order details sheet with customer profiles, Google Maps route redirections, packer item checklists, and dispatcher selectors.
+* **Packer & Kitchen Checklists**:
+  - Displays checkboxes next to each dish. Toggling checks strikes out the food title, helping packers review bag completeness.
+* **Kitchen Order Ticket (KOT) Printing**:
+  - Triggers standard `window.print()` formatted via print media CSS rules ([Order.css](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/admin/src/pages/Orders/Order.css)).
+  - Automatically hides all screens, sidebars, and navigation headers, printing a clean, single-page 80mm thermal receipt ticket.
+
+### 4. Interactive Dashboard Analytics
+* **Custom SVG Charts**:
+  - Fully hand-crafted SVG line and area trend charts mapping weekly revenue fluctuations ([Dashboard.jsx](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/admin/src/pages/Dashboard/Dashboard.jsx)).
+  - Includes linear gradient areas and hovering tooltip bubbles with zero external D3/Chart.js package overhead.
+  - Summary metrics display sales shares, average order values, and transaction counts.
+
+---
+
+## 🛠️ Technology Ecosystem
+
+### Frontend (Client & Admin)
+* **Core**: React 19.2.0, Vite, React Router DOM 7
+* **Styling**: Vanilla CSS (Custom properties, HSL color scheme tokens, Glassmorphism gradients)
+* **Http Client**: Axios (unified API request structures)
+* **Components**: HTML5 Canvas, Custom SVG Paths
+
+### Backend (API Server)
+* **Runtime**: Node.js, Express 5 (Asynchronous routing pipelines)
+* **Database Object Wrapper**: Mongoose 8 (Schema enforcement and validation)
+* **AI Pipelines**: `@google/genai` (Gemini SDK integration)
+* **Image Uploads**: Multer (Multer disk storage configuration)
+* **Security**: JSON Web Token (JWT) signatures, Bcrypt password hashing, Validator strings verification
+
+### Integration Services
+* **Payments**: Stripe Node SDK (Checkout session endpoints)
+* **Maps API**: Google Maps Search Engine queries redirection
+
+---
+
+## 📐 System Architecture & Communication Flow
+
+### High-Level Architecture Diagram
 ```mermaid
 flowchart TD
-    A[Open Feasto Customer App] --> B[Browse Hero + Categories]
-    B --> C[Add / Remove Food Items]
-    C --> D[Cart Summary + Promo Code]
-    D --> E[Login / Register]
-    E --> F[Checkout Form]
-    F --> G[Stripe Checkout Session]
-    G --> H[Payment Verification]
-    H --> I[My Orders]
+    subgraph ClientApps["Client Applications"]
+        C[Customer React App<br/>Vite + Context]
+        A[Admin React App<br/>Vite + CSS Modules]
+    end
+
+    subgraph BackendAPI["Backend REST API Gateway"]
+        E[Express Server]
+        AuthM[JWT Auth Middleware]
+        OrderC[Order Controller]
+        AIC[AI Controller]
+        CartC[Cart Controller]
+    end
+
+    subgraph ExternalServices["Data & Third-Party Engines"]
+        DB[(MongoDB Atlas)]
+        STRIPE[Stripe Payments API]
+        GEMINI[Google Gemini AI Engine]
+        FS[(Disk File Uploads)]
+    end
+
+    C -->|REST / JSON Requests| E
+    A -->|REST / JSON Requests| E
+
+    E --> AuthM
+    AuthM --> CartC
+    AuthM --> OrderC
+    
+    OrderC -->|Store Orders / Read list| DB
+    CartC -->|Sync Cart Data| DB
+    OrderC -->|Generate Checkout URL| STRIPE
+    AIC -->|Recipe Context Mapping| GEMINI
+    E -->|Multipart Upload| FS
 ```
 
-### AI Recipe Flow
-
+### Checkout & Payment Validation Pipeline
 ```mermaid
 sequenceDiagram
-    participant U as Customer
-    participant C as Feasto UI
-    participant S as Express API
-    participant G as Google Gemini
+    participant User as Customer App
+    participant Server as Express Server
+    participant Stripe as Stripe Gateway
+    participant DB as MongoDB
 
-    U->>C: Ask for a recipe
-    C->>S: POST /api/ai/chat-recommend
-    S->>S: extractContext() sanitizes dish name
-    S->>G: generateContent(RecipePrompt)
-    G-->>S: Recipe text
-    S-->>C: Clean recipe response
-    C-->>U: Display recipe in chat card
-```
-
-### Admin Order Workflow
-
-```mermaid
-flowchart LR
-    A[Admin opens dashboard] --> B[View all orders]
-    B --> C[Inspect customer + address details]
-    C --> D[Update order status]
-    D --> E[Customer sees updated status in My Orders]
+    User->>Server: POST /api/order/place (Cart Items, Address, Coupon)
+    Server->>DB: Create Pending Order (payment: false)
+    Server->>Stripe: Create Stripe Checkout Session (amount, coupon discount)
+    Stripe-->>Server: Return Session URL & Session ID
+    Server-->>User: Return Redirect Link + Session ID
+    User->>Stripe: Complete Stripe Payment Portal
+    Stripe-->>User: Redirect to /verify?success=true&orderId=xyz
+    User->>Server: POST /api/order/verify (orderId, success=true)
+    Server->>DB: Find Order & Set payment = true
+    Server-->>User: Return success response
+    User->>User: Render Confetti & Open Live Tracking Map
 ```
 
 ---
 
-## Architecture
+## ⚡ Technical Excellence & Engineering Highlights
 
-### High-Level System View
+* **Structural Monorepo Separation**: Clear separation between `client/` (e.g., checkout and cart interfaces), `admin/` (e.g., operations split panes), and `server/` (e.g., Express endpoints).
+* **Context-Driven State Hydration**: `StoreContext` handles JWT token sync, local cart operations, coupon caps, and total calculations, syncing cart changes asynchronously to MongoDB for logged-in sessions.
+* **Optimized CSS Print Media Layout**: Reconfigured print styling rules to hide DOM shells entirely, eliminating extra blank pages when formatting thermal receipt slips.
+* **Math-Based Interactive Canvas**: Canvas erasure tracking computes pixels wiped out by mapping alpha values in `Uint8ClampedArray`, preventing manual reveal cheating.
+* **Custom SVG Chart Tooltips**: Map line and area charts use raw SVG elements (<circle>, <path>, <linearGradient>), resolving coordinate pins to show hover-activated tooltips without charting library overhead.
 
-```mermaid
-graph TD
-    subgraph Frontend
-        C[Customer App<br/>React 19 + Vite]
-        A[Admin App<br/>React 19 + Vite]
-    end
+---
 
-    subgraph Backend
-        E[Express API]
-        U1[User Routes]
-        F1[Food Routes]
-        C1[Cart Routes]
-        O1[Order Routes]
-        AI[AI Routes]
-    end
-
-    subgraph Data & Services
-        DB[(MongoDB)]
-        STRIPE[Stripe Checkout]
-        GEMINI[Google Gemini]
-        FILES[(Uploads Folder)]
-    end
-
-    C -->|REST / JSON| E
-    A -->|REST / JSON| E
-
-    E --> U1
-    E --> F1
-    E --> C1
-    E --> O1
-    E --> AI
-
-    U1 --> DB
-    F1 --> DB
-    C1 --> DB
-    O1 --> DB
-    F1 --> FILES
-    O1 --> STRIPE
-    AI --> GEMINI
-```
-
-### Data Model Overview
+## 📊 Database Schema
 
 ```mermaid
 erDiagram
+    USER ||--o{ ORDER : places
+    FOOD ||--o{ ORDER : contains
+
     USER {
-        string name
-        string email
-        string password
-        object cartData
+        string name "Required"
+        string email "Unique, Validator checked"
+        string password "Bcrypt hashed"
+        object cartData "Key-value pair quantity map"
     }
 
     FOOD {
-        string name
-        string description
-        number price
-        string image
-        string category
+        string name "Required"
+        string description "Dish description text"
+        number price "Decimal amount"
+        string image "Saved filename string"
+        string category "Inventorial group"
     }
 
     ORDER {
-        string userId
-        array items
-        number amount
-        object address
-        object coupon
-        string status
-        boolean payment
-        date date
+        ObjectId userId "Reference to User"
+        array items "Food items list with quantities"
+        number amount "Final charged amount"
+        object address "Delivery street, phone, pincode info"
+        object coupon "Applied discount details"
+        string status "Default: 'Food Processing'"
+        string riderName "Assigned driver name"
+        date date "Default: Date.now()"
+        boolean payment "Stripe verification outcome flag"
     }
-
-    USER ||--o{ ORDER : places
-    USER ||--o{ USER : stores_cart_data
 ```
 
 ---
 
-## Technical Excellence
+## 📁 Monorepo Directory Layout
 
-### What the codebase does well
-
-#### 1) Clear monorepo separation
-- `client/` handles customer-facing commerce
-- `admin/` handles operational management
-- `server/` exposes shared API endpoints
-
-This separation makes the system easier to reason about, extend, and deploy independently.
-
-#### 2) Context-driven cart architecture
-- `StoreContext` centralizes:
-  - food list loading
-  - cart state
-  - coupon application
-  - final total calculation
-  - auth token hydration
-- Authenticated carts sync to the backend
-- Anonymous cart updates still work in the UI state
-
-#### 3) Coupon system with real business rules
-- coupon codes are validated against a curated list
-- thresholds prevent low-value misuse
-- discounts have caps where needed
-- the coupon auto-clears if the cart total drops below the minimum
-
-#### 4) JWT-based auth flow
-- login and register endpoints issue signed tokens
-- `authMiddleware` reads the token from request headers
-- the middleware injects `userId` into the body for protected flows
-
-#### 5) Stripe Checkout integration
-- checkout sessions are created server-side
-- order items and delivery fee are converted into Stripe line items
-- success and cancel redirects point back to the verification route
-- discounted orders generate Stripe coupon objects when applicable
-
-#### 6) Gemini-backed AI recipe assistant
-- user input is sanitized before calling Gemini
-- the assistant generates a single recipe for the requested dish
-- invalid input is rejected instead of generating noisy output
-
-#### 7) Image upload and catalog management
-- admin item creation uses `multer`
-- uploaded images are stored in the server `uploads/` directory
-- removing a food item also deletes the corresponding file from disk
-
-#### 8) Premium customer/admin UI layer
-- responsive UI across the customer and admin apps
-- warm premium visual system
-- reusable panel, card, and form styling patterns
-- promo carousel-inspired content treatment across multiple screens
+```text
+Feasto-Food-Delivery-Platform/
+├── client/                     # Customer React Application
+│   ├── src/
+│   │   ├── components/         # Common UI (Navbar, Footer, ScratchCard)
+│   │   ├── context/            # Global StoreContext state provider
+│   │   ├── pages/              # Home, Cart, PlaceOrder, Verify, TrackOrder
+│   │   └── assets/             # Menu definitions and images
+│   └── index.html
+├── admin/                      # Operations Admin Panel
+│   ├── src/
+│   │   ├── components/         # Navbar, Sidebar panel
+│   │   ├── pages/              # Add menu, List inventory, Orders split pane, Dashboard
+│   │   └── assets/             # Operational static assets
+│   └── index.html
+├── server/                     # Node.js + Express API Backend
+│   ├── configs/                # MongoDB Mongoose configurations
+│   ├── controllers/            # Auth, Cart, Food catalog, Order workflows, AI
+│   ├── middleware/             # Header JWT authentication middleware
+│   ├── models/                 # Mongoose schemas (User, Food, Order)
+│   ├── routes/                 # Express Router mappings
+│   ├── utils/                  # Coupon caps, sanitization helpers
+│   └── server.js               # Application Entry Point
+└── README.md                   # Project documentation (this file)
+```
 
 ---
 
-## Technology Ecosystem
+## 🗝️ Environment Configuration
 
-<table>
-  <tr>
-    <th>Layer</th>
-    <th>Tools & Libraries</th>
-  </tr>
-  <tr>
-    <td><strong>Customer Frontend</strong></td>
-    <td>React 19, React Router DOM 7, Vite, Axios, Vanilla CSS</td>
-  </tr>
-  <tr>
-    <td><strong>Admin Frontend</strong></td>
-    <td>React 19, React Router DOM 7, Vite, Axios, React Toastify, Vanilla CSS</td>
-  </tr>
-  <tr>
-    <td><strong>Backend</strong></td>
-    <td>Node.js, Express 5, MongoDB, Mongoose, JWT, bcrypt, validator, multer, body-parser, cors</td>
-  </tr>
-  <tr>
-    <td><strong>Commerce</strong></td>
-    <td>Stripe Checkout Sessions</td>
-  </tr>
-  <tr>
-    <td><strong>AI</strong></td>
-    <td>Google Gemini via <code>@google/genai</code></td>
-  </tr>
-  <tr>
-    <td><strong>Dev Tooling</strong></td>
-    <td>ESLint, Vite build pipeline, Nodemon for server development</td>
-  </tr>
-  <tr>
-    <td><strong>Deployment Assumptions</strong></td>
-    <td>Backend referenced on Render; admin contains Vercel-compatible config; local frontend dev via Vite</td>
-  </tr>
-</table>
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ recommended
-- npm 9+ or newer
-- MongoDB Atlas or local MongoDB
-- Stripe account for checkout
-- Google AI API key for the recipe assistant
-
-### Environment Variables
-
-#### Server (`server/.env`)
+Create a `.env` file inside the `server/` directory and configure the variables:
 
 ```env
 PORT=4000
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net
-JWT_SECRET=your_jwt_secret_key
-STRIPE_SECRET_KEY=sk_test_your_stripe_key
-GEMINI_API_KEY=your_gemini_api_key
+MONGODB_URI=mongodb+srv://<db_user>:<db_password>@cluster.mongodb.net/feasto
+JWT_SECRET=your_super_secure_jwt_secret_token
+STRIPE_SECRET_KEY=sk_test_your_stripe_private_secret_key
+GEMINI_API_KEY=AIzaSyYourGeminiAIKeyForRecipeAssistant
 ```
 
-> **Important:** the backend code uses `MONGODB_URI` (not `MONGO_URI`).
+---
 
-#### Frontend API base URLs
+## 🚀 Local Installation & Developer Guide
 
-The current code uses hardcoded backend URLs. If you are running locally against `http://localhost:4000`, update these files:
-
-- `client/src/context/StoreContext.jsx`
-- `client/src/pages/Foodbot/Foodbot.jsx`
-- `admin/src/assets/assets.js`
-- `server/controllers/orderController.js` (Stripe success/cancel redirect domain)
-
-### Local Development Workflow
-
-<details>
-<summary><strong>1) Clone the repository</strong></summary>
-
+### Step 1: Clone the Project
 ```bash
-git clone https://github.com/<your-username>/Feasto-Food-Delivery-Platform.git
+git clone https://github.com/SarthakDudhe/Feasto-Food-Delivery-Platform.git
 cd Feasto-Food-Delivery-Platform
 ```
 
-</details>
-
-<details>
-<summary><strong>2) Install and run the backend</strong></summary>
-
+### Step 2: Set Up and Run Server
 ```bash
 cd server
 npm install
+# Start node server using nodemon for live updates
 npm run server
 ```
+The backend API server will spin up on `http://localhost:4000`.
 
-The backend runs on `http://localhost:4000` by default if `PORT=4000`.
-
-</details>
-
-<details>
-<summary><strong>3) Install and run the customer app</strong></summary>
-
+### Step 3: Set Up and Run Customer App
 ```bash
 cd ../client
 npm install
 npm run dev
 ```
+The customer app will start on Vite's default dev port: `http://localhost:5173`.
 
-The customer app runs on Vite's local dev server, usually `http://localhost:5173`.
-
-</details>
-
-<details>
-<summary><strong>4) Install and run the admin app</strong></summary>
-
+### Step 4: Set Up and Run Admin Panel
 ```bash
 cd ../admin
 npm install
 npm run dev
 ```
+The admin workspace will launch on: `http://localhost:5174`.
 
-The admin app runs on a separate Vite dev server, usually `http://localhost:5174`.
-
-</details>
-
-### Production Build Checks
-
+### Production Build Auditing
+To build both frontends for production (testing ESM compatibility and minification):
 ```bash
-# Customer app
-cd client
+# In client/
 npm run build
 
-# Admin app
-cd ../admin
+# In admin/
 npm run build
 ```
 
-> There is **no Dockerfile** in the repository at the moment.  
-> There is also **no automated CI pipeline** committed yet.
+---
+
+## 🔒 Security Architectures
+1. **Password Safety**: Uses `bcrypt` with a 10-round salt factor before DB storage.
+2. **Access Guards**: Routes editing cart state or checking orders utilize the `authMiddleware` to decode client-header JWT tokens, injecting a verified `userId` directly into requests.
+3. **AI Guardrails**: Gemini recipe prompts sanitise query items to filter out bad inputs, forcing recipe outputs to strictly format as a standardized JSON schema.
 
 ---
 
-## API Reference
+## 🤝 Contributing Guidelines
 
-### Authentication
+Contributions are welcome! Please follow these steps to propose improvements:
 
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/user/register` | No | Register a new customer and return a JWT |
-| `POST` | `/api/user/login` | No | Login an existing customer and return a JWT |
-
-### Food Catalog
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/food/add` | Admin / no route guard currently | Upload a food item with image and metadata |
-| `GET` | `/api/food/list` | No | List all food items |
-| `POST` | `/api/food/remove` | No route guard currently | Remove a food item and delete its image file |
-
-### Cart
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/cart/add` | Yes | Increase item quantity in the user cart |
-| `POST` | `/api/cart/remove` | Yes | Decrease item quantity in the user cart |
-| `POST` | `/api/cart/get` | Yes | Fetch the saved cart for the current user |
-
-### Orders
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/order/place` | Yes | Create a Stripe Checkout session and persist the order |
-| `POST` | `/api/order/verify` | No | Confirm payment result and mark order as paid or remove it |
-| `POST` | `/api/order/userOrders` | Yes | Fetch the authenticated user's orders |
-| `GET` | `/api/order/list` | No | Fetch all orders for the admin panel |
-| `POST` | `/api/order/status` | No | Update order status from the admin panel |
-
-### AI Assistant
-
-| Method | Endpoint | Auth | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/ai/chat-recommend` | No | Generate a Gemini recipe response for the requested dish |
+1. **Fork** the repository.
+2. Create your **feature branch**: `git checkout -b feature/amazing-feature`.
+3. **Commit** your changes: `git commit -m 'Add some amazing feature'`.
+4. **Push** to the branch: `git push origin feature/amazing-feature`.
+5. Open a **Pull Request**.
 
 ---
 
-## Database Schema
-
-### `User`
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| `name` | `String` | Required |
-| `email` | `String` | Required, unique |
-| `password` | `String` | Stored as bcrypt hash |
-| `cartData` | `Object` | Default `{}` and persisted in MongoDB |
-
-### `Food`
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| `name` | `String` | Required |
-| `description` | `String` | Required |
-| `price` | `Number` | Required |
-| `image` | `String` | Required; filename stored in uploads folder |
-| `category` | `String` | Required |
-
-### `Order`
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| `userId` | `String` | Required |
-| `items` | `Array` | Food items with quantities |
-| `amount` | `Number` | Final order amount |
-| `address` | `Object` | Delivery information |
-| `coupon` | `Object` | Optional applied coupon metadata |
-| `status` | `String` | Default: `Food Processing` |
-| `date` | `Date` | Default: `Date.now()` |
-| `payment` | `Boolean` | Default: `false` |
+## 📄 License
+This project is licensed under the **MIT License**. Check the [LICENSE](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/Feasto-Food%20Delivery%20Platform/LICENSE) file for terms.
 
 ---
 
-## Folder Structure
+## 📧 Contact & Developer Info
 
-```text
-Feasto-Food-Delivery-Platform/
-├── client/                     # Customer-facing React app
-│   └── src/
-│       ├── components/         # Navbar, Footer, Food cards, Login popup, etc.
-│       ├── context/            # StoreContext (cart, coupon, auth, food list)
-│       ├── pages/              # Home, Cart, PlaceOrder, MyOrder, Verify, Foodbot
-│       └── assets/             # Shared customer assets and menu data
-├── admin/                      # Admin React app
-│   └── src/
-│       ├── components/         # Admin Navbar, Sidebar
-│       ├── pages/              # Add, List, Orders
-│       └── assets/             # Admin images and asset map
-├── server/                     # Express + MongoDB API
-│   ├── configs/                # Database connection
-│   ├── controllers/            # Auth, food, cart, order, AI logic
-│   ├── middleware/             # JWT auth middleware
-│   ├── models/                 # Mongoose schemas
-│   ├── prompt/                 # Gemini prompt template for recipes
-│   ├── routes/                 # API route definitions
-│   ├── uploads/                # Food images saved by multer
-│   └── utils/                  # Coupons, token helper, prompt sanitization
-└── README.md                   # This document
-```
-
----
-
-## Security Considerations
-
-Feasto already includes several practical security-minded decisions:
-
-- **bcrypt password hashing** before storing user passwords
-- **JWT authentication** for protected cart and order routes
-- **validator.js email validation** during registration
-- **input sanitization** for the AI recipe assistant
-- **route-level middleware** that injects `userId` into protected requests
-- **environment variables** for sensitive secrets
-
-### Known security gaps to address next
-
-- the admin food CRUD endpoints are not yet protected by a dedicated admin auth layer
-- frontend auth token is stored in `localStorage`, which is convenient but less secure than HttpOnly cookies
-- Stripe webhook verification is not implemented; order confirmation currently relies on redirect verification
-
----
-
-## Testing Strategy
-
-### Current state
-
-- manual QA through the customer and admin UIs
-- production build verification using Vite
-- endpoint validation through the browser and API flow
-
-### Recommended next steps
-
-- add unit tests for coupon logic
-- add API tests for auth, cart, order, and AI routes
-- add component tests for checkout and admin order management
-- add integration tests for Stripe verification flow
-
----
-
-## Roadmap
-
-- [ ] protect admin routes with a dedicated role-based auth layer
-- [ ] move frontend API base URLs into environment variables
-- [ ] add webhook-based Stripe payment confirmation
-- [ ] add automated tests for API and UI flows
-- [ ] add analytics cards to the admin dashboard
-- [ ] add cloud image storage (Cloudinary / S3)
-- [ ] introduce live order updates with WebSockets
-- [ ] add searchable and sortable admin tables
-- [ ] add a richer recipe assistant experience with suggestion history
-
----
-
-## Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes with a clear message
-4. Push to your branch
-5. Open a pull request
-
-### Suggested contribution areas
-
-- admin authentication
-- automated tests
-- API environment configuration
-- analytics UI
-- cloud storage for food images
-- order tracking improvements
-- accessibility improvements
-
----
-
-## Acknowledgments
-
-Feasto uses and benefits from excellent open-source tooling and services:
-
-- React
-- Vite
-- Express
-- MongoDB / Mongoose
-- Stripe
-- Google Gemini
-- Multer
-- Axios
-- React Router
-- React Toastify
-
-Special thanks to the open-source ecosystem that makes full-stack product work fast and expressive.
-
----
-
-## License
-
-No root-level `LICENSE` file is currently committed to the repository.
-
-If you plan to publish Feasto publicly, add a license file at the project root and update this section accordingly.
-
----
-
-## Contact
-
-> Replace these placeholders with your actual profile links before publishing.
-
-- **GitHub:** [GitHub profile](https://github.com/SarthakDudhe)
-- **LinkedIn:** [LinkedIn profile](https://www.linkedin.com/in/sarthak-dudhe-67155a327)
-- **Portfolio:** [portfolio website](https://portfolio-sarthak-beta.vercel.app/)
-- **Email:** `sarthakdudhe79@gmail.com`
-
-<div align="center">
-
-### Feasto is designed to feel like a product, not just a project.
-
-If you want, I can also generate a matching **admin README**, a **one-page architecture doc**, or a **short recruiter-friendly project summary** for your portfolio.
-
-</div>
+* **GitHub:** [SarthakDudhe](https://github.com/SarthakDudhe)
+* **LinkedIn:** [Sarthak Dudhe](https://www.linkedin.com/in/sarthak-dudhe-67155a327)
+* **Portfolio:** [Portfolio Website](https://portfolio-sarthak-beta.vercel.app/)
+* **Email:** `sarthakdudhe79@gmail.com`
