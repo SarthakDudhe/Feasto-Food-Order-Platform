@@ -28,7 +28,7 @@ const StoreContextProvider = (props)=>{
     const [appliedCoupon,setAppliedCoupon] = useState(null);
     const [couponMessage,setCouponMessage] = useState("");
 
-const url = "https://feasto-backend-e0ic.onrender.com"
+const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000"
 const[token,setToken] = useState("");
 const [food_list,setFoodList] = useState([])
 

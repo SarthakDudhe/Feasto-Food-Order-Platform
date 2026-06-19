@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 //Placing user Order from frontend
 const placeOrder = async (req,res) => {
 
-const frontend_url = "https://feasto-food-delivery-platform.onrender.com"
+const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173"
 
   try {
     const subtotal = req.body.items.reduce((total,item)=>total + (item.price * item.quantity),0);
