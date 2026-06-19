@@ -9,7 +9,8 @@ address:{type:Object,required:true},
 coupon:{type:Object,default:null},
 status:{type:String,default:"Food Processing"},
 date:{type:Date,default:Date.now()},
-payment:{type:Boolean,default:false}
+payment:{type:Boolean,default:false},
+riderName:{type:String,default:""}
 })
 
 const orderModel = mongoose.models.order || mongoose.model("order",orderSchema) 

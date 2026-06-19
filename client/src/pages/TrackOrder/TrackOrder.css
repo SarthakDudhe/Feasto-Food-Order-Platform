@@ -615,3 +615,143 @@
     margin-top: 4px;
   }
 }
+
+/* Rider profile card style */
+.rider-profile-card {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.rider-profile-card.glowing {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(255, 90, 61, 0.15);
+  animation: border-glow 1.5s infinite alternate;
+}
+
+@keyframes border-glow {
+  from {
+    border-color: var(--border);
+    box-shadow: 0 0 5px rgba(255, 90, 61, 0.05);
+  }
+  to {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(255, 90, 61, 0.25);
+  }
+}
+
+.rider-profile-card h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+}
+
+.rider-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rider-avatar {
+  font-size: 32px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 90, 61, 0.1);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rider-details h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.rider-details p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rider-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.rider-contact-btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  outline: none;
+}
+
+.rider-contact-btn.call {
+  background: var(--accent);
+  color: #ffffff;
+  border: 1px solid var(--accent);
+}
+
+.rider-contact-btn.call:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  box-shadow: 0 4px 12px rgba(255, 90, 61, 0.2);
+}
+
+.rider-contact-btn.message {
+  background: var(--surface-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.rider-contact-btn.message:hover {
+  background: var(--border);
+}
+
+/* Custom self-contained toast notification */
+.rider-toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--text);
+  color: #ffffff;
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  font-weight: 700;
+  font-size: 14px;
+  animation: slide-up-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-up-fade {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

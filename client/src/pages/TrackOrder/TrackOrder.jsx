@@ -14,6 +14,12 @@ export default function TrackOrder() {
   const [error, setError] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pollCount, setPollCount] = useState(0);
+  const [riderMessageSent, setRiderMessageSent] = useState(false);
+
+  const handleSendMessage = () => {
+    setRiderMessageSent(true);
+    setTimeout(() => setRiderMessageSent(false), 3000);
+  };
 
   // Status mapping to indices
   const getStatusIndex = (status) => {
@@ -370,6 +376,30 @@ export default function TrackOrder() {
             </div>
           </div>
 
+          {/* Delivery Rider Details */}
+          {order.riderName && (
+            <div className={`rider-profile-card ${order.status === "Out for delivery" ? "glowing" : ""}`}>
+              <h3>Delivery Partner</h3>
+              <div className="rider-info">
+                <div className="rider-avatar">
+                  🚴
+                </div>
+                <div className="rider-details">
+                  <h4>{order.riderName}</h4>
+                  <p>Accredited Feasto Fleet Partner</p>
+                </div>
+              </div>
+              <div className="rider-actions">
+                <a href={`tel:${order.address.phone}`} className="rider-contact-btn call">
+                  📞 Call Rider
+                </a>
+                <button onClick={handleSendMessage} className="rider-contact-btn message">
+                  💬 Message
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="sidebar-actions">
             <Link to="/myorders" className="btn-back-link">
               ← Return to My Orders
@@ -377,6 +407,13 @@ export default function TrackOrder() {
           </div>
         </div>
       </div>
+
+      {/* Custom self-contained toast notification */}
+      {riderMessageSent && (
+        <div className="rider-toast-notification">
+          💬 Message sent to {order.riderName}!
+        </div>
+      )}
     </div>
   );
 }

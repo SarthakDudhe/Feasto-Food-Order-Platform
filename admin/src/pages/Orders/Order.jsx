@@ -9,6 +9,14 @@ const Order = ({url}) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("All")
   const [sortOption, setSortOption] = useState("newest")
+  const [activePrintOrder, setActivePrintOrder] = useState(null)
+
+  const riders = [
+    "John Doe (Scooter)",
+    "Jane Smith (E-Bike)",
+    "Bob Johnson (Van)",
+    "Alice Williams (Walk)"
+  ]
 
   const fetchAllOrders = async () => {
     const response = await axios.get(url + "/api/order/list")
@@ -34,8 +42,34 @@ const Order = ({url}) => {
     }
   }
 
+  const assignRiderHandler = async (orderId, riderName) => {
+    const response = await axios.post(url + "/api/order/assign", {
+      orderId,
+      riderName
+    })
+    if (response.data.success) {
+      toast.success("Rider assigned successfully")
+      await fetchAllOrders()
+    } else {
+      toast.error("Failed to assign rider")
+    }
+  }
+
+  const handlePrintKOT = (order) => {
+    setActivePrintOrder(order)
+    setTimeout(() => {
+      window.print()
+    }, 100)
+  }
+
   useEffect(() => {
     fetchAllOrders()
+
+    const handleAfterPrint = () => {
+      setActivePrintOrder(null)
+    }
+    window.addEventListener('afterprint', handleAfterPrint)
+    return () => window.removeEventListener('afterprint', handleAfterPrint)
   }, [])
 
   // Filter and Sort in memory
@@ -151,6 +185,16 @@ const Order = ({url}) => {
                   <p>
                     {order.address.city}, {order.address.state}, {order.address.country} - {order.address.pincode}
                   </p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      `${order.address.street}, ${order.address.city}, ${order.address.state}, ${order.address.country} - ${order.address.pincode}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="view-map-link"
+                  >
+                    📍 View Map
+                  </a>
                 </div>
 
                 <p className="order-item-phone">
@@ -161,11 +205,28 @@ const Order = ({url}) => {
               <p><b>Items:</b> {order.items.length}</p>
               <p><b>Amount:</b> ${order.amount}</p>
 
-              <select onChange={(event) => statusHandler(event, order._id)} value={order.status}>
-                <option value="Food Processing">Food Processing</option>
-                <option value="Out for delivery">Out for delivery</option>
-                <option value="Delivered">Delivered</option>
-              </select>
+              <div className="order-item-actions">
+                <select onChange={(event) => statusHandler(event, order._id)} value={order.status}>
+                  <option value="Food Processing">Food Processing</option>
+                  <option value="Out for delivery">Out for delivery</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+
+                <select
+                  onChange={(event) => assignRiderHandler(order._id, event.target.value)}
+                  value={order.riderName || ""}
+                  className="rider-select"
+                >
+                  <option value="">Assign Rider</option>
+                  {riders.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+
+                <button onClick={() => handlePrintKOT(order)} className="print-kot-btn">
+                  Print KOT 🖨️
+                </button>
+              </div>
             </div>
           ))
         ) : (
@@ -176,6 +237,56 @@ const Order = ({url}) => {
           </div>
         )}
       </div>
+
+      {/* KOT Print Receipt Template (hidden on screen, visible only during printing) */}
+      {activePrintOrder && (
+        <div className="kot-print-receipt">
+          <div className="kot-header">
+            <h2>KITCHEN ORDER TICKET (KOT)</h2>
+            <p className="kot-order-id">Order ID: {activePrintOrder._id}</p>
+            <p className="kot-date">Date: {activePrintOrder.date ? new Date(activePrintOrder.date).toLocaleString() : new Date().toLocaleString()}</p>
+          </div>
+          <hr />
+          <div className="kot-customer">
+            <h3>Customer Details</h3>
+            <p><strong>Name:</strong> {activePrintOrder.address.firstName} {activePrintOrder.address.lastName}</p>
+            <p><strong>Phone:</strong> {activePrintOrder.address.phone}</p>
+            <p><strong>Address:</strong> {activePrintOrder.address.street}, {activePrintOrder.address.city}, {activePrintOrder.address.state}, {activePrintOrder.address.country} - {activePrintOrder.address.pincode}</p>
+          </div>
+          <hr />
+          <div className="kot-items">
+            <h3>Items Ordered</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activePrintOrder.items.map((item, idx) => (
+                  <tr key={idx}>
+                    <td>{item.name}</td>
+                    <td>{item.quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {activePrintOrder.riderName && (
+            <>
+              <hr />
+              <div className="kot-rider">
+                <p><strong>Assigned Rider:</strong> {activePrintOrder.riderName}</p>
+              </div>
+            </>
+          )}
+          <hr />
+          <div className="kot-footer">
+            <p>Feasto Kitchen Management System</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

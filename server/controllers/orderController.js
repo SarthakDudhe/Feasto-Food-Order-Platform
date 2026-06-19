@@ -232,4 +232,19 @@ const getOrderAnalytics = async (req, res) => {
   }
 };
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics}
+// Assign a delivery rider to an order
+const assignRider = async (req, res) => {
+  try {
+    const { orderId, riderName } = req.body;
+    const order = await orderModel.findByIdAndUpdate(orderId, { riderName }, { new: true });
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+    res.json({ success: true, message: "Rider assigned successfully", data: order });
+  } catch (error) {
+    console.error(error.message);
+    res.json({ success: false, message: "Error assigning rider" });
+  }
+};
+
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider}

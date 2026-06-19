@@ -280,7 +280,8 @@
   }
 
   .order-item > p,
-  .order-item select {
+  .order-item select,
+  .order-item-actions {
     grid-column: 2;
     text-align: left;
   }
@@ -298,8 +299,164 @@
   }
 
   .order-item > p,
-  .order-item select {
+  .order-item select,
+  .order-item-actions {
     grid-column: 1;
     text-align: left;
+  }
+}
+
+/* Operation controls styling */
+.view-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.view-map-link:hover {
+  color: var(--accent-dark);
+  transform: translateX(2px);
+}
+
+.order-item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.print-kot-btn {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border: 1px solid rgba(255, 90, 61, 0.15);
+  border-radius: 14px;
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  outline: none;
+}
+
+.print-kot-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(255, 90, 61, 0.15);
+  transform: translateY(-1px);
+}
+
+.print-kot-btn:active {
+  transform: translateY(0);
+}
+
+/* Screen hidden KOT Receipt container */
+.kot-print-receipt {
+  display: none;
+}
+
+/* Print Specific Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .kot-print-receipt, .kot-print-receipt * {
+    visibility: visible;
+  }
+
+  .kot-print-receipt {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm; /* Standard kitchen slip size */
+    margin: 0;
+    padding: 10px;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .kot-header {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .kot-header h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 6px 0;
+    letter-spacing: 1px;
+  }
+
+  .kot-order-id, .kot-date {
+    margin: 3px 0;
+    font-size: 11px;
+  }
+
+  .kot-print-receipt hr {
+    border: none;
+    border-top: 1px dashed #000000;
+    margin: 8px 0;
+    height: 0;
+  }
+
+  .kot-customer h3, .kot-items h3 {
+    font-size: 13px;
+    margin: 10px 0 6px 0;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .kot-customer p {
+    margin: 4px 0;
+    font-size: 12px;
+  }
+
+  .kot-print-receipt table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+
+  .kot-print-receipt th, .kot-print-receipt td {
+    padding: 6px 0;
+    text-align: left;
+    font-size: 12px;
+  }
+
+  .kot-print-receipt th {
+    font-weight: bold;
+    border-bottom: 1px dashed #000000;
+  }
+
+  .kot-print-receipt td:last-child, .kot-print-receipt th:last-child {
+    text-align: right;
+  }
+
+  .kot-rider p {
+    font-size: 12px;
+    margin: 4px 0;
+  }
+
+  .kot-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 10px;
+    font-weight: bold;
   }
 }
