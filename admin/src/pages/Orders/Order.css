@@ -856,29 +856,56 @@
   display: none;
 }
 
-/* Print Specific Styles */
+/* Print Specific Styles - Optimized for Single Page KOT receipt */
 @media print {
-  body * {
-    visibility: hidden;
+  /* Completely hide all navigation, sidebars and layout shells */
+  .navbar,
+  .sidebar,
+  .logo,
+  header,
+  footer,
+  aside {
+    display: none !important;
   }
-  
-  .kot-print-receipt, .kot-print-receipt * {
-    visibility: visible;
+
+  /* Completely hide all screen-only elements inside the Order page to prevent DOM spacing reservation */
+  .page-intro,
+  .order-control-bar,
+  .status-tabs-container,
+  .orders-split-container,
+  .no-orders-fallback {
+    display: none !important;
+  }
+
+  /* Reset layout constraints on all parent wrapper elements */
+  body, 
+  html, 
+  #root, 
+  .admin-shell,
+  .app-content, 
+  .order.add {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    min-height: auto !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: block !important;
   }
 
   .kot-print-receipt {
     display: block !important;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 80mm; /* Standard kitchen slip size */
-    margin: 0;
+    position: relative !important;
+    width: 80mm;
+    margin: 0 auto;
     padding: 10px;
     background: #ffffff !important;
     color: #000000 !important;
     font-family: 'Courier New', Courier, monospace;
     font-size: 13px;
     line-height: 1.4;
+    page-break-inside: avoid;
   }
 
   .kot-header {
