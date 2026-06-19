@@ -10,6 +10,9 @@ const Order = ({url}) => {
   const [statusFilter, setStatusFilter] = useState("All")
   const [sortOption, setSortOption] = useState("newest")
   const [activePrintOrder, setActivePrintOrder] = useState(null)
+  const [selectedOrderId, setSelectedOrderId] = useState(null)
+  const [viewMode, setViewMode] = useState("list")
+  const [checkedItems, setCheckedItems] = useState({})
 
   const riders = [
     "John Doe (Scooter)",
@@ -62,6 +65,14 @@ const Order = ({url}) => {
     }, 100)
   }
 
+  const toggleItemCheck = (orderId, idx) => {
+    const key = `${orderId}_${idx}`;
+    setCheckedItems(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
   useEffect(() => {
     fetchAllOrders()
 
@@ -101,6 +112,20 @@ const Order = ({url}) => {
       }
       return 0;
     });
+
+  // Sync selection when filters or items change
+  useEffect(() => {
+    if (filteredOrders.length > 0) {
+      const exists = filteredOrders.some(o => o._id === selectedOrderId);
+      if (!exists) {
+        setSelectedOrderId(filteredOrders[0]._id);
+      }
+    } else {
+      setSelectedOrderId(null);
+    }
+  }, [orders, statusFilter, searchTerm, sortOption]);
+
+  const selectedOrder = orders.find(o => o._id === selectedOrderId);
 
   const getStatusCount = (status) => {
     if (status === "All") return orders.length;
@@ -162,80 +187,187 @@ const Order = ({url}) => {
         ))}
       </div>
 
-      {/* Orders List */}
-      <div className="order-list">
-        {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => (
-            <div key={order._id} className="order-item">
-              <img src={assets.parcel_icon} alt="parcel" />
+      {/* Split Pane Workspace Layout */}
+      <div className="orders-split-container">
+        {/* Left Side: Orders Scrollable List */}
+        <div className={`orders-sidebar-list ${viewMode === "inspector" ? "mobile-hidden" : ""}`}>
+          {filteredOrders.length > 0 ? (
+            filteredOrders.map((order) => {
+              const isSelected = order._id === selectedOrderId;
+              return (
+                <div
+                  key={order._id}
+                  onClick={() => {
+                    setSelectedOrderId(order._id);
+                    setViewMode("inspector");
+                  }}
+                  className={`orders-sidebar-card ${isSelected ? "selected" : ""}`}
+                >
+                  <div className="card-top-row">
+                    <span className="card-order-id">#{order._id.substring(order._id.length - 6).toUpperCase()}</span>
+                    <span className={`status-badge-inline ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="card-middle-row">
+                    <h4 className="card-cust-name">{order.address.firstName} {order.address.lastName}</h4>
+                    <p className="card-item-count">{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</p>
+                  </div>
+                  <div className="card-bottom-row">
+                    <span className="card-amount">${order.amount}</span>
+                    <span className="card-date">
+                      {order.date ? new Date(order.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="no-orders-fallback-sidebar">
+              <span className="fallback-emoji">📭</span>
+              <p>No matching orders</p>
+            </div>
+          )}
+        </div>
 
-              <div>
-                <p className="order-item-food">
-                  {order.items
-                    .map(item => `${item.name} x ${item.quantity}`)
-                    .join(", ")}
-                </p>
+        {/* Right Side: Order Detail Inspector */}
+        <div className={`orders-main-inspector ${viewMode === "list" ? "mobile-hidden" : ""}`}>
+          {selectedOrder ? (
+            <div className="inspector-content">
+              {/* Mobile Back Button */}
+              <button className="back-to-list-btn" onClick={() => setViewMode("list")}>
+                ← Back to Order List
+              </button>
 
-                <p className="order-item-name">
-                  {order.address.firstName} {order.address.lastName}
-                </p>
+              {/* Inspector Header */}
+              <div className="inspector-header">
+                <div className="inspector-title-row">
+                  <div>
+                    <h2>Order Details</h2>
+                    <p className="inspector-id">ID: <span className="highlight-text">#{selectedOrder._id}</span></p>
+                  </div>
+                  <div className="inspector-date-amount">
+                    <div className="inspector-amount">${selectedOrder.amount}</div>
+                    <div className="inspector-date">
+                      {selectedOrder.date ? new Date(selectedOrder.date).toLocaleString() : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                <div className="order-item-address">
-                  <p>{order.address.street},</p>
-                  <p>
-                    {order.address.city}, {order.address.state}, {order.address.country} - {order.address.pincode}
-                  </p>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      `${order.address.street}, ${order.address.city}, ${order.address.state}, ${order.address.country} - ${order.address.pincode}`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="view-map-link"
-                  >
-                    📍 View Map
-                  </a>
+              <hr />
+
+              {/* Grid split for customer details and checklist */}
+              <div className="inspector-body-grid">
+                
+                {/* Customer Details Block */}
+                <div className="inspector-block customer-card-block">
+                  <h3>Customer & Delivery Profile</h3>
+                  <div className="detail-field">
+                    <span className="field-label">Name:</span>
+                    <span className="field-value">{selectedOrder.address.firstName} {selectedOrder.address.lastName}</span>
+                  </div>
+                  <div className="detail-field">
+                    <span className="field-label">Phone:</span>
+                    <span className="field-value">📞 {selectedOrder.address.phone}</span>
+                  </div>
+                  <div className="detail-field">
+                    <span className="field-label">Address:</span>
+                    <span className="field-value">
+                      {selectedOrder.address.street}, {selectedOrder.address.city}, {selectedOrder.address.state}, {selectedOrder.address.country} - {selectedOrder.address.pincode}
+                    </span>
+                  </div>
+                  <div className="detail-field-action">
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        `${selectedOrder.address.street}, ${selectedOrder.address.city}, ${selectedOrder.address.state}, ${selectedOrder.address.country} - ${selectedOrder.address.pincode}`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="view-map-link"
+                    >
+                      📍 Open Navigation Route
+                    </a>
+                  </div>
                 </div>
 
-                <p className="order-item-phone">
-                  📞 {order.address.phone}
-                </p>
+                {/* Operations Control Actions block */}
+                <div className="inspector-block operations-block">
+                  <h3>Operational Status Controls</h3>
+                  <div className="control-selectors">
+                    <div className="selector-group">
+                      <label>Preparation Status</label>
+                      <select onChange={(event) => statusHandler(event, selectedOrder._id)} value={selectedOrder.status}>
+                        <option value="Food Processing">Food Processing</option>
+                        <option value="Out for delivery">Out for delivery</option>
+                        <option value="Delivered">Delivered</option>
+                      </select>
+                    </div>
+
+                    <div className="selector-group">
+                      <label>Courier Rider</label>
+                      <select
+                        onChange={(event) => assignRiderHandler(selectedOrder._id, event.target.value)}
+                        value={selectedOrder.riderName || ""}
+                        className="rider-select"
+                      >
+                        <option value="">Assign Rider</option>
+                        {riders.map((r) => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <button onClick={() => handlePrintKOT(selectedOrder)} className="print-kot-btn">
+                    Print KOT (Kitchen Receipt) 🖨️
+                  </button>
+                </div>
               </div>
 
-              <p><b>Items:</b> {order.items.length}</p>
-              <p><b>Amount:</b> ${order.amount}</p>
+              <hr />
 
-              <div className="order-item-actions">
-                <select onChange={(event) => statusHandler(event, order._id)} value={order.status}>
-                  <option value="Food Processing">Food Processing</option>
-                  <option value="Out for delivery">Out for delivery</option>
-                  <option value="Delivered">Delivered</option>
-                </select>
+              {/* Chef Packing Checklist */}
+              <div className="inspector-checklist-section">
+                <div className="checklist-header">
+                  <h3>Packer & Kitchen Checklist</h3>
+                  <p>Check off dishes as they are prepared and placed in the delivery packet.</p>
+                </div>
 
-                <select
-                  onChange={(event) => assignRiderHandler(order._id, event.target.value)}
-                  value={order.riderName || ""}
-                  className="rider-select"
-                >
-                  <option value="">Assign Rider</option>
-                  {riders.map((r) => (
-                    <option key={r} value={r}>{r}</option>
-                  ))}
-                </select>
-
-                <button onClick={() => handlePrintKOT(order)} className="print-kot-btn">
-                  Print KOT 🖨️
-                </button>
+                <div className="checklist-items-grid">
+                  {selectedOrder.items.map((item, idx) => {
+                    const isChecked = !!checkedItems[`${selectedOrder._id}_${idx}`];
+                    return (
+                      <label key={idx} className={`checklist-item-wrapper ${isChecked ? "checked" : ""}`}>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleItemCheck(selectedOrder._id, idx)}
+                          className="checklist-checkbox-input"
+                        />
+                        <div className="custom-checkbox-face">
+                          {isChecked && <span className="checkmark-icon">✓</span>}
+                        </div>
+                        <div className="checklist-item-text">
+                          <span className="item-qty-badge">{item.quantity}x</span>
+                          <span className="item-dish-name">{item.name}</span>
+                          <span className="item-dish-category">({item.category || 'Menu Item'})</span>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
+
             </div>
-          ))
-        ) : (
-          <div className="no-orders-fallback">
-            <span className="fallback-emoji">📭</span>
-            <h3>No orders found</h3>
-            <p>We couldn't find any orders matching your search or filters.</p>
-          </div>
-        )}
+          ) : (
+            <div className="no-order-selected-fallback">
+              <span className="fallback-emoji">📋</span>
+              <h3>No Order Selected</h3>
+              <p>Select an incoming order from the left list to review delivery addresses, assign riders, check off items, or print receipt tickets.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* KOT Print Receipt Template (hidden on screen, visible only during printing) */}
