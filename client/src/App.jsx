@@ -8,6 +8,7 @@ import Footer from './components/Footer/Footer'
 import LoginPopup from './components/LoginPopup/LoginPopup'
 import Verify from './pages/Verify/Verify'
 import MyOrder from './pages/MyOrder/MyOrder'
+import TrackOrder from './pages/TrackOrder/TrackOrder'
 
 
 
@@ -34,6 +35,7 @@ useEffect(() => {
     <Route path='/order' element={<PlaceOrder/>}/>
     <Route path='/verify' element={<Verify/>}/>
     <Route path='/myorders' element={<MyOrder/>}/>
+    <Route path='/track-order/:orderId' element={<TrackOrder/>}/>
     {/* <Route path='/foodmate' element={<Foodbot/>}/> */}
 
   </Routes>

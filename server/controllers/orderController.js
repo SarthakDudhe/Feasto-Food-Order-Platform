@@ -96,6 +96,7 @@ const verifyOrder = async (req,res) => {
         res.json({success:false,message:"Payment Failed"})
        }
 
+
     } catch (error) {
                 console.log(error.message)
     res.json({success:false,message:"Error"})
@@ -137,6 +138,26 @@ const updateStatus = async (req,res) => {
     }
 }
 
+// Retrieve a single order detail
+const getOrderDetail = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const order = await orderModel.findById(orderId);
+    
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
 
+    // Security check: ensure order belongs to requesting user
+    if (order.userId !== req.body.userId) {
+      return res.json({ success: false, message: "Unauthorized access to order" });
+    }
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus}
+    res.json({ success: true, data: order });
+  } catch (error) {
+    console.log(error.message);
+    res.json({ success: false, message: "Error" });
+  }
+}
+
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail}
