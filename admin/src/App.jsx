@@ -4,12 +4,13 @@ import { Route, Routes } from 'react-router-dom'
 import Add from './pages/Add/Add'
 import List from './pages/List/List'
 import Order from './pages/Orders/Order'
+import Dashboard from './pages/Dashboard/Dashboard'
 import { ToastContainer } from 'react-toastify';
 
 
 function App() {
  
-  const url = "https://feasto-backend-e0ic.onrender.com"
+  const url = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000"
 
   return (
     <>
@@ -21,9 +22,11 @@ function App() {
     <Sidebar/>
    
       <Routes>
-  <Route path='/add' element={<Add url={url}/>}  />
-  <Route path='/list' element={<List url={url}/>}  />
-  <Route path='/order' element={<Order url={url}/>}  />
+        <Route path='/' element={<Dashboard url={url}/>}  />
+        <Route path='/dashboard' element={<Dashboard url={url}/>}  />
+        <Route path='/add' element={<Add url={url}/>}  />
+        <Route path='/list' element={<List url={url}/>}  />
+        <Route path='/order' element={<Order url={url}/>}  />
       </Routes>
 
   </div>

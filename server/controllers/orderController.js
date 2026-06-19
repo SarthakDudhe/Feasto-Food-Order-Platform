@@ -160,4 +160,76 @@ const getOrderDetail = async (req, res) => {
   }
 }
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail}
+// Get order statistics and analytics for Admin Dashboard
+const getOrderAnalytics = async (req, res) => {
+  try {
+    const orders = await orderModel.find({ payment: true });
+    
+    let totalRevenue = 0;
+    let totalOrders = orders.length;
+    let categorySales = {};
+    let dailyRevenue = {};
+
+    // Initialize last 7 days of daily revenue
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      dailyRevenue[dateString] = 0;
+    }
+
+    orders.forEach(order => {
+      totalRevenue += order.amount;
+      
+      // Calculate daily trends
+      if (order.date) {
+        const orderDate = new Date(order.date);
+        const dateString = orderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        if (dailyRevenue[dateString] !== undefined) {
+          dailyRevenue[dateString] += order.amount;
+        }
+      }
+
+      // Calculate category counts
+      if (order.items) {
+        order.items.forEach(item => {
+          const category = item.category || "Other";
+          const qty = item.quantity || 1;
+          const salesVal = item.price * qty;
+          categorySales[category] = (categorySales[category] || 0) + salesVal;
+        });
+      }
+    });
+
+    const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders) : 0;
+
+    // Convert dailyRevenue to array for chart line
+    const revenueTrend = Object.keys(dailyRevenue).map(key => ({
+      date: key,
+      revenue: Math.round(dailyRevenue[key])
+    }));
+
+    // Convert categorySales to array
+    const categoryTrend = Object.keys(categorySales).map(key => ({
+      category: key,
+      value: Math.round(categorySales[key])
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        totalRevenue: Math.round(totalRevenue),
+        totalOrders,
+        averageOrderValue: Math.round(averageOrderValue * 100) / 100,
+        revenueTrend,
+        categoryTrend,
+        recentOrders: orders.slice(-5).reverse() // Last 5 orders
+      }
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.json({ success: false, message: "Error" });
+  }
+};
+
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics}

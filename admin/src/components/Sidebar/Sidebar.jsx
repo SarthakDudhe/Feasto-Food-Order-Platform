@@ -6,6 +6,10 @@ const Sidebar = () => {
   return (
     <div className='sidebar'>
 <div className="sidebar-options">
+    <NavLink to="/" className="sidebar-option">
+        <span style={{ fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" }}>📊</span>
+        <p>Dashboard</p>
+    </NavLink>
     <NavLink to={"/add"} className="sidebar-option">
         <img src={assets.add_icon} alt="" />
         <p>Add Item</p>
