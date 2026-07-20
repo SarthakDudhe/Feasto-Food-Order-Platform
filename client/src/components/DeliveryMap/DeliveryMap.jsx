@@ -2,58 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./DeliveryMap.css";
+import { geocodeAddress } from "../../utils/geocode";
+import { fetchRouteGeometry, fetchRouteWithETA } from "../../utils/routing";
 
 // ---------------------------------------------------------------------------
 // Static "Feasto Kitchen" coordinates (Mumbai – update to your restaurant's real location)
 const RESTAURANT_COORDS = [72.8777, 19.0760]; // [lng, lat]
-
-// ---------------------------------------------------------------------------
-// Helper: Geocode an address string → [lng, lat] via Nominatim (free, no key)
-async function geocodeAddress(addressObj) {
-  try {
-    const parts = [
-      addressObj.street,
-      addressObj.city,
-      addressObj.state,
-      addressObj.pincode,
-      "India",
-    ]
-      .filter(Boolean)
-      .join(", ");
-
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-      parts
-    )}&format=json&limit=1`;
-
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Feasto-FoodDelivery/1.0" },
-    });
-    const data = await res.json();
-
-    if (data && data[0]) {
-      return [parseFloat(data[0].lon), parseFloat(data[0].lat)];
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Helper: Fetch road route from OSRM (free, no key needed)
-async function fetchRoute(from, to) {
-  try {
-    const url = `https://router.project-osrm.org/route/v1/driving/${from[0]},${from[1]};${to[0]},${to[1]}?overview=full&geometries=geojson`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.routes && data.routes[0]) {
-      return data.routes[0].geometry; // GeoJSON LineString
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Helper: Create an HTML marker element
@@ -197,35 +151,22 @@ export default function DeliveryMap({ order, statusIndex }) {
 
       markersRef.current = [rm, riderM, cm];
 
-      // --- Fetch & draw route segments ---
-      const [seg1, seg2] = await Promise.all([
-        fetchRoute(RESTAURANT_COORDS, effectiveRiderCoords),
-        fetchRoute(effectiveRiderCoords, customerCoords),
+      // --- Fetch route segments + ETA using utility functions ---
+      const [seg1Result, seg2Result] = await Promise.all([
+        fetchRouteWithETA(RESTAURANT_COORDS, effectiveRiderCoords),
+        fetchRouteWithETA(effectiveRiderCoords, customerCoords),
       ]);
 
-      if (seg1) {
-        drawRoute(map, "route-seg1", seg1, "#ff5a3d", 0.9); // Feasto orange – completed leg
+      if (seg1Result.geometry) {
+        drawRoute(map, "route-seg1", seg1Result.geometry, "#ff5a3d", 0.9); // Feasto orange – completed leg
       }
-      if (seg2) {
-        drawRoute(map, "route-seg2", seg2, "#efdcd3", 0.75); // muted – upcoming leg
+      if (seg2Result.geometry) {
+        drawRoute(map, "route-seg2", seg2Result.geometry, "#efdcd3", 0.75); // muted – upcoming leg
       }
 
-      // --- Estimate ETA based on second segment distance ---
-      if (seg2 && seg2.coordinates && seg2.coordinates.length > 1) {
-        // very rough: 30 km/h average delivery speed
-        try {
-          const etaRes = await fetch(
-            `https://router.project-osrm.org/route/v1/driving/${effectiveRiderCoords[0]},${effectiveRiderCoords[1]};${customerCoords[0]},${customerCoords[1]}?overview=false`
-          );
-          const etaData = await etaRes.json();
-          if (etaData.routes && etaData.routes[0]) {
-            const seconds = etaData.routes[0].duration;
-            const mins = Math.ceil(seconds / 60);
-            setEta(mins);
-          }
-        } catch {
-          // ETA is non-critical, ignore
-        }
+      // --- Set ETA from the rider → customer segment ---
+      if (seg2Result.eta) {
+        setEta(seg2Result.eta.etaMinutes);
       }
 
       // --- Fit map to show all three points ---
