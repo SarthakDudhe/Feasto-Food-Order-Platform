@@ -1,0 +1,156 @@
+/* ─── Wrapper ──────────────────────────────────────────────────────────────── */
+.dm-wrapper {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #f9f4f1;
+  box-shadow: inset 0 1px 3px rgba(76, 42, 31, 0.04);
+}
+
+/* ─── Map canvas ───────────────────────────────────────────────────────────── */
+.dm-map {
+  width: 100%;
+  height: 300px;
+  display: block;
+}
+
+/* ─── Loading / Error overlay ─────────────────────────────────────────────── */
+.dm-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 249, 245, 0.88);
+  backdrop-filter: blur(4px);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
+
+.dm-overlay--warn {
+  color: #c0392b;
+}
+
+.dm-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: dm-spin 0.9s linear infinite;
+}
+
+@keyframes dm-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── ETA badge (floats top-left over map) ────────────────────────────────── */
+.dm-eta-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  background: var(--text);
+  color: #ffffff;
+  padding: 7px 14px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(44, 33, 29, 0.22);
+  animation: dm-fadeIn 0.5s ease;
+  pointer-events: none;
+}
+
+@keyframes dm-fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Custom map markers ───────────────────────────────────────────────────── */
+.dm-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default;
+  user-select: none;
+}
+
+.dm-marker__bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  border: 2.5px solid rgba(255, 255, 255, 0.9);
+}
+
+.dm-marker__emoji {
+  transform: rotate(45deg); /* counter-rotate so emoji is upright */
+  font-size: 20px;
+  line-height: 1;
+}
+
+.dm-marker__label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  letter-spacing: 0.03em;
+}
+
+/* Restaurant – Feasto orange */
+.dm-marker--restaurant .dm-marker__bubble {
+  background: var(--accent);
+}
+
+/* Rider – dark charcoal */
+.dm-marker--rider .dm-marker__bubble {
+  background: var(--text);
+  animation: dm-rider-glow 2s infinite alternate;
+}
+
+@keyframes dm-rider-glow {
+  from { box-shadow: 0 6px 18px rgba(44, 33, 29, 0.2); }
+  to   { box-shadow: 0 6px 24px rgba(44, 33, 29, 0.45); }
+}
+
+/* Customer – teal */
+.dm-marker--customer .dm-marker__bubble {
+  background: #2ec4b6;
+}
+
+/* ─── MapLibre attribution override to match design ──────────────────────── */
+.maplibregl-ctrl-attrib {
+  font-size: 10px !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-radius: 6px !important;
+}
+
+.maplibregl-ctrl-zoom-in,
+.maplibregl-ctrl-zoom-out {
+  background-color: var(--surface-strong) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.maplibregl-ctrl-zoom-in:hover,
+.maplibregl-ctrl-zoom-out:hover {
+  background-color: var(--accent-soft) !important;
+}
