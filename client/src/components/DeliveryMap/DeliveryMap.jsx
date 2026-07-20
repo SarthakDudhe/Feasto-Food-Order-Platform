@@ -4,61 +4,68 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./DeliveryMap.css";
 import { fetchRouteWithETA } from "../../utils/routing";
 
-// ─── Feasto Kitchen — Bandra West, Mumbai (hardcoded) ────────────────────────
+// ── Feasto Kitchen: Hill Road, Bandra West, Mumbai ───────────────────────────
 const RESTAURANT = {
-  coords: [72.8296, 19.0544], // Hill Road, Bandra West [lng, lat]
-  name:   "Feasto Kitchen, Bandra",
+  coords: [72.8296, 19.0544],
+  name: "Feasto Kitchen, Bandra",
 };
 
-// Fallback if user denies location — Andheri West (~7 km, ~18-22 min)
+// Fallback delivery point when geolocation is denied (Andheri West ~7 km away)
 const FALLBACK = {
   coords: [72.8347, 19.1136],
-  label:  "Andheri West, Mumbai (Demo)",
+  label: "Andheri West, Mumbai (Demo)",
 };
 
-// ─── Animated dash frames for remaining-route segment ────────────────────────
+// Animated dash frames for the remaining-leg line
 const DASH_SEQ = [
-  [0,4,3],[0.5,4,2.5],[1,4,2],[1.5,4,1.5],[2,4,1],[2.5,4,0.5],
-  [3,4,0],[0,0.5,3,3.5],[0,1,3,3],[0,1.5,3,2.5],[0,2,3,2],
-  [0,2.5,3,1.5],[0,3,3,1],[0,3.5,3,0.5],[0,4,3,0],
+  [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5],
+  [2, 4, 1], [2.5, 4, 0.5], [3, 4, 0], [0, 0.5, 3, 3.5],
+  [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2],
+  [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5], [0, 4, 3, 0],
 ];
 
-// ─── Map layer helpers ────────────────────────────────────────────────────────
+// ── Layer helpers ─────────────────────────────────────────────────────────────
 function safeRemove(map, id) {
-  if (map.getLayer(id))   map.removeLayer(id);
-  if (map.getSource(id))  map.removeSource(id);
+  if (map.getLayer(id)) map.removeLayer(id);
+  if (map.getSource(id)) map.removeSource(id);
 }
 
 function drawSolid(map, id, geojson) {
   safeRemove(map, id + "-glow");
   safeRemove(map, id);
   map.addSource(id, { type: "geojson", data: geojson });
-  map.addLayer({ id: id+"-glow", type:"line", source:id,
-    layout:{"line-join":"round","line-cap":"round"},
-    paint:{"line-color":"#ff5a3d","line-width":14,"line-opacity":0.14,"line-blur":8},
+  map.addLayer({
+    id: id + "-glow", type: "line", source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": "#ff5a3d", "line-width": 14, "line-opacity": 0.14, "line-blur": 8 },
   });
-  map.addLayer({ id, type:"line", source:id,
-    layout:{"line-join":"round","line-cap":"round"},
-    paint:{"line-color":"#ff5a3d","line-width":5,"line-opacity":0.95},
+  map.addLayer({
+    id, type: "line", source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": "#ff5a3d", "line-width": 5, "line-opacity": 0.95 },
   });
 }
 
 function drawDashed(map, id, geojson) {
-  safeRemove(map, id+"-bg");
+  safeRemove(map, id + "-bg");
   safeRemove(map, id);
-  map.addSource(id, { type:"geojson", data:geojson });
-  map.addLayer({ id:id+"-bg", type:"line", source:id,
-    layout:{"line-join":"round","line-cap":"round"},
-    paint:{"line-color":"#c8b4ab","line-width":5,"line-opacity":0.3},
+  map.addSource(id, { type: "geojson", data: geojson });
+  map.addLayer({
+    id: id + "-bg", type: "line", source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: { "line-color": "#c8b4ab", "line-width": 5, "line-opacity": 0.3 },
   });
-  map.addLayer({ id, type:"line", source:id,
-    layout:{"line-join":"round","line-cap":"round"},
-    paint:{"line-color":"#ff5a3d","line-width":4,"line-opacity":0.85,"line-dasharray":DASH_SEQ[0]},
+  map.addLayer({
+    id, type: "line", source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: {
+      "line-color": "#ff5a3d", "line-width": 4,
+      "line-opacity": 0.85, "line-dasharray": DASH_SEQ[0],
+    },
   });
 }
 
-// ─── Marker element ───────────────────────────────────────────────────────────
-function mkMarker(emoji, label, cls) {
+function mkMarkerEl(emoji, label, cls) {
   const el = document.createElement("div");
   el.className = `dm-marker dm-marker--${cls}`;
   el.innerHTML = `
@@ -67,7 +74,7 @@ function mkMarker(emoji, label, cls) {
   return el;
 }
 
-// ─── Geolocation (retries without highAccuracy on failure) ───────────────────
+// ── Browser geolocation (retries without highAccuracy on non-denial failures) ─
 function getLocation() {
   return new Promise((resolve) => {
     if (!navigator.geolocation) return resolve(null);
@@ -89,50 +96,61 @@ export default function DeliveryMap({ order, statusIndex }) {
   const rafRef       = useRef(null);
   const dashIdx      = useRef(0);
 
-  const [mapReady,   setMapReady]   = useState(false);
-  const [phase,      setPhase]      = useState("idle"); // idle|requesting|loading|done
-  const [routeInfo,  setRouteInfo]  = useState(null);
-  const [locData,    setLocData]    = useState(null);
+  // UI state
+  const [mapReady,  setMapReady]  = useState(false);
+  const [phase,     setPhase]     = useState("idle"); // idle | requesting | loading | done
+  const [routeInfo, setRouteInfo] = useState(null);   // { etaMinutes, distanceKm, isFallback }
 
-  // ―― Extract STABLE PRIMITIVES from order ――――――――――――――――――――――――――――――――
-  // Using primitives (not the order object) in the dep array prevents the effect
-  // from re-running on every server poll that returns a new object reference.
-  const orderId    = order._id;
-  const riderLat   = order.riderLat  ?? null;
-  const riderLng   = order.riderLng  ?? null;
-  const riderName  = order.riderName ?? "";
+  // Single atomic location object — prevents race conditions
+  // Shape: { coords:[lng,lat], isFallback:boolean } | null
+  const [locData, setLocData] = useState(null);
 
-  // ── Dash animation ──────────────────────────────────────────────────────────
+  // Stable primitives — prevent draw effect from re-running on every server poll
+  const orderId   = order._id;
+  const riderLat  = order.riderLat  ?? null;
+  const riderLng  = order.riderLng  ?? null;
+  const riderName = order.riderName ?? "";
+
+  // ── Animate dashes on remaining-leg layer ──────────────────────────────────
   const animateDash = useCallback((map, layerId) => {
-    if (!map || !map.getLayer(layerId)) return;
     const tick = (ts) => {
       const i = Math.floor(ts / 60) % DASH_SEQ.length;
       if (i !== dashIdx.current) {
         dashIdx.current = i;
-        try { map.setPaintProperty(layerId, "line-dasharray", DASH_SEQ[i]); }
-        catch (_) { /* map may have been removed */ }
+        try {
+          if (map.getLayer(layerId)) {
+            map.setPaintProperty(layerId, "line-dasharray", DASH_SEQ[i]);
+          }
+        } catch (_) { /* map destroyed */ }
       }
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
   }, []);
 
-  // ── Mount map once, centered on Bandra kitchen ─────────────────────────────
+  // ── Mount MapLibre, centered on Bandra ────────────────────────────────────
   useEffect(() => {
     if (mapRef.current) return;
+
     const map = new maplibregl.Map({
-      container:        mapContainer.current,
-      style:            "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-      center:           RESTAURANT.coords,
-      zoom:             14,
-      minZoom:          12,
-      maxZoom:          18,
+      container: mapContainer.current,
+      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+      center: RESTAURANT.coords,
+      zoom: 14,
+      minZoom: 12,
+      maxZoom: 18,
       attributionControl: false,
-      pitchWithRotate:  false,
+      pitchWithRotate: false,
     });
-    map.addControl(new maplibregl.AttributionControl({ compact:true }), "bottom-right");
-    map.addControl(new maplibregl.NavigationControl({ showCompass:false }), "top-right");
-    map.on("load", () => { mapRef.current = map; setMapReady(true); });
+
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+
+    map.on("load", () => {
+      mapRef.current = map;
+      setMapReady(true);
+    });
+
     return () => {
       cancelAnimationFrame(rafRef.current);
       map.remove();
@@ -140,11 +158,10 @@ export default function DeliveryMap({ order, statusIndex }) {
     };
   }, []);
 
-  // ── "Share Location" handler ────────────────────────────────────────────────
+  // ── Location button handlers ───────────────────────────────────────────────
   const handleShare = useCallback(async () => {
     setPhase("requesting");
     const coords = await getLocation();
-    // Set atomically — draw effect reads both coords + isFallback from one object
     setLocData({ coords: coords ?? FALLBACK.coords, isFallback: !coords });
     setPhase("loading");
   }, []);
@@ -154,20 +171,21 @@ export default function DeliveryMap({ order, statusIndex }) {
     setPhase("loading");
   }, []);
 
-  // ── Draw routes when we have locData ───────────────────────────────────────
+  // ── Draw markers + routes when location and map are both ready ─────────────
   useEffect(() => {
     if (!mapReady || !locData || !mapRef.current) return;
-    const map = mapRef.current;
 
-    // Cancel previous animation and clear old markers on each re-run
+    const map = mapRef.current;
+    const custCoords = locData.coords;
+    const isFallback = locData.isFallback;
+
+    // Cleanup previous draw
     cancelAnimationFrame(rafRef.current);
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
     setRouteInfo(null);
 
-    const { coords: custCoords, isFallback } = locData;
-
-    // Rider point: use admin-set GPS primitives, else simulate 42% along route
+    // Rider position: admin-set GPS or 42% along restaurant→customer path
     const riderPt = (riderLat && riderLng)
       ? [riderLng, riderLat]
       : [
@@ -175,25 +193,32 @@ export default function DeliveryMap({ order, statusIndex }) {
           RESTAURANT.coords[1] + (custCoords[1] - RESTAURANT.coords[1]) * 0.42,
         ];
 
+    // Place markers
+    const m1 = new maplibregl.Marker({
+      element: mkMarkerEl("🍴", RESTAURANT.name, "restaurant"),
+      anchor: "bottom",
+    }).setLngLat(RESTAURANT.coords).addTo(map);
+
+    const m2 = new maplibregl.Marker({
+      element: mkMarkerEl("🛵", riderName || "Your Rider", "rider"),
+      anchor: "bottom",
+    }).setLngLat(riderPt).addTo(map);
+
+    const m3 = new maplibregl.Marker({
+      element: mkMarkerEl("📍", isFallback ? "Demo Location" : "Your Location", "customer"),
+      anchor: "bottom",
+    }).setLngLat(custCoords).addTo(map);
+
+    markersRef.current = [m1, m2, m3];
+
+    // Fetch route segments
     const draw = async () => {
-      const restCoords = RESTAURANT.coords;
-
-      // Place markers
-      const m1 = new maplibregl.Marker({ element: mkMarker("🍴", RESTAURANT.name, "restaurant"), anchor:"bottom" })
-        .setLngLat(restCoords).addTo(map);
-      const m2 = new maplibregl.Marker({ element: mkMarker("🛵", riderName || "Your Rider", "rider"), anchor:"bottom" })
-        .setLngLat(riderPt).addTo(map);
-      const m3 = new maplibregl.Marker({ element: mkMarker("📍", isFallback ? "Demo Location" : "Your Location", "customer"), anchor:"bottom" })
-        .setLngLat(custCoords).addTo(map);
-      markersRef.current = [m1, m2, m3];
-
-      // Fetch routes
       const [seg1, seg2] = await Promise.all([
-        fetchRouteWithETA(restCoords, riderPt),
+        fetchRouteWithETA(RESTAURANT.coords, riderPt),
         fetchRouteWithETA(riderPt, custCoords),
       ]);
 
-      if (!mapRef.current) return; // unmounted during async
+      if (!mapRef.current) return; // unmounted during fetch
 
       if (seg1.geometry) drawSolid(map, "seg-done", seg1.geometry);
       if (seg2.geometry) {
@@ -202,21 +227,23 @@ export default function DeliveryMap({ order, statusIndex }) {
       }
       if (seg2.eta) setRouteInfo({ ...seg2.eta, isFallback });
 
-      // Fit all 3 pins at street level
-      const b = new maplibregl.LngLatBounds();
-      [restCoords, riderPt, custCoords].forEach((c) => b.extend(c));
-      map.fitBounds(b, {
-        padding:  { top:70, bottom:130, left:60, right:60 },
-        minZoom:  13,
-        maxZoom:  16,
+      // Fit camera to show all 3 pins at street level
+      const bounds = new maplibregl.LngLatBounds();
+      [RESTAURANT.coords, riderPt, custCoords].forEach((c) => bounds.extend(c));
+      map.fitBounds(bounds, {
+        padding: { top: 70, bottom: 130, left: 60, right: 60 },
+        minZoom: 13,
+        maxZoom: 16,
         duration: 1400,
-        easing:   (t) => t * (2 - t),
+        easing: (t) => t * (2 - t),
       });
 
       setPhase("done");
     };
 
     draw();
+
+  // Stable primitives prevent re-running on every server poll
   }, [mapReady, locData, riderLat, riderLng, riderName, orderId, animateDash]);
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -228,7 +255,10 @@ export default function DeliveryMap({ order, statusIndex }) {
         <div className="dm-location-prompt">
           <div className="dm-prompt-icon">📍</div>
           <h4>See Your Delivery Route</h4>
-          <p>Share your location to view the live route from <strong>Feasto Kitchen, Bandra</strong> to your door.</p>
+          <p>
+            Share your location to view the live route from{" "}
+            <strong>Feasto Kitchen, Bandra</strong> to your door.
+          </p>
           <button className="dm-share-btn" onClick={handleShare}>
             <span>📡</span> Share My Location
           </button>
@@ -238,7 +268,7 @@ export default function DeliveryMap({ order, statusIndex }) {
         </div>
       )}
 
-      {/* Requesting / loading overlay */}
+      {/* Loading overlays */}
       {(phase === "requesting" || phase === "loading") && (
         <div className="dm-overlay">
           <div className="dm-spinner" />
@@ -250,7 +280,7 @@ export default function DeliveryMap({ order, statusIndex }) {
         </div>
       )}
 
-      {/* Map canvas — always mounted so MapLibre can attach */}
+      {/* Map canvas — always mounted */}
       <div
         ref={mapContainer}
         className="dm-map"
@@ -292,7 +322,6 @@ export default function DeliveryMap({ order, statusIndex }) {
               </div>
             </>
           )}
-
           <div className="dm-info-legend">
             {routeInfo.isFallback && (
               <span className="dm-info-fallback">📌 {FALLBACK.label}</span>
