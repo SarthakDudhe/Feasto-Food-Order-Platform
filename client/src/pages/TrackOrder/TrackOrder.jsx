@@ -308,12 +308,24 @@ export default function TrackOrder() {
                 </div>
               </div>
               <div className="rider-actions">
-                <a href={`tel:${order.address.phone}`} className="rider-contact-btn call">
-                  📞 Call Rider
+                <a
+                  href={`https://wa.me/${order.riderPhone ? order.riderPhone.replace(/[^\d]/g, '') : '919876543210'}?text=${encodeURIComponent(
+                    `Hi ${order.riderName}, I'm tracking my Feasto order #${order._id.slice(-6).toUpperCase()}. Could you please share an update on your ETA? 🛵`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rider-contact-btn whatsapp"
+                >
+                  💬 WhatsApp
                 </a>
-                <button onClick={handleSendMessage} className="rider-contact-btn message">
-                  💬 Message
-                </button>
+                <a
+                  href={`sms:${order.riderPhone || '+919876543210'}?body=${encodeURIComponent(
+                    `Hi ${order.riderName}, tracking Feasto order #${order._id.slice(-6).toUpperCase()} - any update?`
+                  )}`}
+                  className="rider-contact-btn sms"
+                >
+                  📱 SMS Text
+                </a>
               </div>
             </div>
           )}

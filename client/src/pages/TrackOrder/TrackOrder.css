@@ -728,26 +728,28 @@
   outline: none;
 }
 
-.rider-contact-btn.call {
-  background: var(--accent);
+.rider-contact-btn.whatsapp {
+  background: #25D366;
   color: #ffffff;
-  border: 1px solid var(--accent);
+  border: 1px solid #20bd5a;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
 }
 
-.rider-contact-btn.call:hover {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
-  box-shadow: 0 4px 12px rgba(255, 90, 61, 0.2);
+.rider-contact-btn.whatsapp:hover {
+  background: #20bd5a;
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
+  transform: translateY(-1px);
 }
 
-.rider-contact-btn.message {
+.rider-contact-btn.sms {
   background: var(--surface-soft);
   color: var(--text);
   border: 1px solid var(--border);
 }
 
-.rider-contact-btn.message:hover {
+.rider-contact-btn.sms:hover {
   background: var(--border);
+  transform: translateY(-1px);
 }
 
 /* Custom self-contained toast notification */
