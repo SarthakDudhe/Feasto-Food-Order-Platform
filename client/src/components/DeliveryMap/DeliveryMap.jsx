@@ -1,88 +1,179 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./DeliveryMap.css";
 import { geocodeAddress } from "../../utils/geocode";
-import { fetchRouteGeometry, fetchRouteWithETA } from "../../utils/routing";
+import { fetchRouteWithETA } from "../../utils/routing";
 
-// ---------------------------------------------------------------------------
-// Static "Feasto Kitchen" coordinates (Mumbai – update to your restaurant's real location)
-const RESTAURANT_COORDS = [72.8777, 19.0760]; // [lng, lat]
+// ─── Restaurant home base ────────────────────────────────────────────────────
+// Update to your actual restaurant coordinates [lng, lat]
+const RESTAURANT_COORDS = [72.8777, 19.076];
 
-// ---------------------------------------------------------------------------
-// Helper: Create an HTML marker element
-function createMarkerEl(emoji, label, colorClass) {
-  const el = document.createElement("div");
-  el.className = `dm-marker dm-marker--${colorClass}`;
-  el.innerHTML = `
-    <div class="dm-marker__bubble">
-      <span class="dm-marker__emoji">${emoji}</span>
-    </div>
-    <div class="dm-marker__label">${label}</div>
-    <div class="dm-marker__pin"></div>
-  `;
-  return el;
-}
+// ─── Animated dash sequence for the "remaining route" segment ────────────────
+const DASH_SEQUENCE = [
+  [0, 4, 3],
+  [0.5, 4, 2.5],
+  [1, 4, 2],
+  [1.5, 4, 1.5],
+  [2, 4, 1],
+  [2.5, 4, 0.5],
+  [3, 4, 0],
+  [0, 0.5, 3, 3.5],
+  [0, 1, 3, 3],
+  [0, 1.5, 3, 2.5],
+  [0, 2, 3, 2],
+  [0, 2.5, 3, 1.5],
+  [0, 3, 3, 1],
+  [0, 3.5, 3, 0.5],
+  [0, 4, 3, 0],
+];
 
-// ---------------------------------------------------------------------------
-// Helper: Draw or update a route layer on the map
-function drawRoute(map, id, geojson, color, opacity = 0.85) {
-  // Remove old source/layer if they exist
+// ─── Helper: remove a map layer+source safely ────────────────────────────────
+function safeRemoveLayer(map, id) {
   if (map.getLayer(id)) map.removeLayer(id);
   if (map.getSource(id)) map.removeSource(id);
+}
+
+// ─── Helper: draw a solid glowing route (completed leg) ─────────────────────
+function drawCompletedRoute(map, id, geojson) {
+  safeRemoveLayer(map, id + "-glow");
+  safeRemoveLayer(map, id);
 
   map.addSource(id, { type: "geojson", data: geojson });
+
+  // Glow layer underneath
+  map.addLayer({
+    id: id + "-glow",
+    type: "line",
+    source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: {
+      "line-color": "#ff5a3d",
+      "line-width": 12,
+      "line-opacity": 0.18,
+      "line-blur": 6,
+    },
+  });
+
+  // Solid route on top
   map.addLayer({
     id,
     type: "line",
     source: id,
     layout: { "line-join": "round", "line-cap": "round" },
     paint: {
-      "line-color": color,
+      "line-color": "#ff5a3d",
       "line-width": 5,
-      "line-opacity": opacity,
-      "line-dasharray": [0, 0],
+      "line-opacity": 0.95,
     },
   });
 }
 
-// ---------------------------------------------------------------------------
+// ─── Helper: draw an animated dashed route (remaining leg) ───────────────────
+function drawRemainingRoute(map, id, geojson) {
+  safeRemoveLayer(map, id + "-bg");
+  safeRemoveLayer(map, id);
+
+  map.addSource(id, { type: "geojson", data: geojson });
+
+  // Dim background track
+  map.addLayer({
+    id: id + "-bg",
+    type: "line",
+    source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: {
+      "line-color": "#c8b4ab",
+      "line-width": 5,
+      "line-opacity": 0.35,
+    },
+  });
+
+  // Animated dashed overlay
+  map.addLayer({
+    id,
+    type: "line",
+    source: id,
+    layout: { "line-join": "round", "line-cap": "round" },
+    paint: {
+      "line-color": "#ff5a3d",
+      "line-width": 4,
+      "line-opacity": 0.85,
+      "line-dasharray": DASH_SEQUENCE[0],
+    },
+  });
+}
+
+// ─── Helper: build a custom HTML marker ─────────────────────────────────────
+function createMarkerEl(emoji, label, cls) {
+  const el = document.createElement("div");
+  el.className = `dm-marker dm-marker--${cls}`;
+  el.innerHTML = `
+    <div class="dm-marker__bubble">
+      <span class="dm-marker__emoji">${emoji}</span>
+    </div>
+    <div class="dm-marker__label">${label}</div>
+  `;
+  return el;
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 export default function DeliveryMap({ order, statusIndex }) {
   const mapContainer = useRef(null);
-  const mapRef = useRef(null);
-  const markersRef = useRef([]);
+  const mapRef       = useRef(null);
+  const markersRef   = useRef([]);
+  const animFrameRef = useRef(null);
+  const dashStepRef  = useRef(0);
 
-  const [mapReady, setMapReady] = useState(false);
-  const [geocodeState, setGeocodeState] = useState("idle"); // idle | loading | done | error
-  const [eta, setEta] = useState(null);
+  const [mapReady, setMapReady]         = useState(false);
+  const [geocodeState, setGeocodeState] = useState("idle");
+  const [routeInfo, setRouteInfo]       = useState(null); // { etaMinutes, distanceKm }
 
-  // Rider coords come from the order (set by admin) or fall back to midpoint
   const riderCoords =
     order.riderLat && order.riderLng
       ? [order.riderLng, order.riderLat]
       : null;
 
-  // -------------------------------------------------------------------------
-  // 1. Mount the MapLibre map once
+  // ── Animate remaining-leg dashes ──────────────────────────────────────────
+  const startDashAnimation = useCallback((map, layerId) => {
+    if (!map || !map.getLayer(layerId)) return;
+
+    function step(timestamp) {
+      const newStep = Math.floor(timestamp / 60) % DASH_SEQUENCE.length;
+      if (newStep !== dashStepRef.current) {
+        dashStepRef.current = newStep;
+        if (map.getLayer(layerId)) {
+          map.setPaintProperty(layerId, "line-dasharray", DASH_SEQUENCE[newStep]);
+        }
+      }
+      animFrameRef.current = requestAnimationFrame(step);
+    }
+
+    animFrameRef.current = requestAnimationFrame(step);
+  }, []);
+
+  // ── Mount MapLibre once ───────────────────────────────────────────────────
   useEffect(() => {
-    if (mapRef.current) return; // already initialised
+    if (mapRef.current) return;
 
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json", // free, no key
+      // CARTO Positron – clean, minimal, great for route highlighting
+      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: RESTAURANT_COORDS,
       zoom: 13,
       attributionControl: false,
+      pitchWithRotate: false,
     });
 
-    // Compact attribution
     map.addControl(
       new maplibregl.AttributionControl({ compact: true }),
       "bottom-right"
     );
-
-    // Zoom controls
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      "top-right"
+    );
 
     map.on("load", () => {
       mapRef.current = map;
@@ -90,121 +181,170 @@ export default function DeliveryMap({ order, statusIndex }) {
     });
 
     return () => {
+      cancelAnimationFrame(animFrameRef.current);
       map.remove();
       mapRef.current = null;
     };
   }, []);
 
-  // -------------------------------------------------------------------------
-  // 2. Once map is ready + order is loaded, geocode & draw everything
+  // ── Draw routes + markers once map + order are ready ─────────────────────
   useEffect(() => {
     if (!mapReady || !order || !mapRef.current) return;
     const map = mapRef.current;
 
-    // Clear existing markers
+    // Stop any previous animation
+    cancelAnimationFrame(animFrameRef.current);
+
+    // Remove old markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
     const run = async () => {
       setGeocodeState("loading");
+      setRouteInfo(null);
 
-      // --- Geocode customer address ---
       const customerCoords = await geocodeAddress(order.address);
 
       if (!customerCoords) {
         setGeocodeState("error");
-        // Still show restaurant marker even if geocoding fails
-        const rEl = createMarkerEl("🍴", "Feasto Kitchen", "restaurant");
-        const rm = new maplibregl.Marker({ element: rEl })
+        new maplibregl.Marker({ element: createMarkerEl("🍴", "Feasto Kitchen", "restaurant"), anchor: "bottom" })
           .setLngLat(RESTAURANT_COORDS)
           .addTo(map);
-        markersRef.current.push(rm);
         return;
       }
 
       setGeocodeState("done");
 
-      // --- Determine effective rider position ---
-      const effectiveRiderCoords =
-        riderCoords ||
-        [
-          (RESTAURANT_COORDS[0] + customerCoords[0]) / 2,
-          (RESTAURANT_COORDS[1] + customerCoords[1]) / 2,
-        ];
+      // Rider midpoint fallback if admin hasn't set GPS yet
+      const effectiveRider = riderCoords ?? [
+        RESTAURANT_COORDS[0] * 0.6 + customerCoords[0] * 0.4,
+        RESTAURANT_COORDS[1] * 0.6 + customerCoords[1] * 0.4,
+      ];
 
-      // --- Place markers ---
-      const restaurantEl = createMarkerEl("🍴", "Feasto Kitchen", "restaurant");
-      const riderEl = createMarkerEl("🛵", order.riderName || "Rider", "rider");
-      const customerEl = createMarkerEl("🏠", "Your Location", "customer");
+      // ── Markers ─────────────────────────────────────────────────────────
+      const rM = new maplibregl.Marker({ element: createMarkerEl("🍴", "Feasto Kitchen", "restaurant"), anchor: "bottom" })
+        .setLngLat(RESTAURANT_COORDS).addTo(map);
+      const riM = new maplibregl.Marker({ element: createMarkerEl("🛵", order.riderName || "Rider", "rider"), anchor: "bottom" })
+        .setLngLat(effectiveRider).addTo(map);
+      const cM = new maplibregl.Marker({ element: createMarkerEl("🏠", "Your Home", "customer"), anchor: "bottom" })
+        .setLngLat(customerCoords).addTo(map);
 
-      const rm = new maplibregl.Marker({ element: restaurantEl, anchor: "bottom" })
-        .setLngLat(RESTAURANT_COORDS)
-        .addTo(map);
+      markersRef.current = [rM, riM, cM];
 
-      const riderM = new maplibregl.Marker({ element: riderEl, anchor: "bottom" })
-        .setLngLat(effectiveRiderCoords)
-        .addTo(map);
-
-      const cm = new maplibregl.Marker({ element: customerEl, anchor: "bottom" })
-        .setLngLat(customerCoords)
-        .addTo(map);
-
-      markersRef.current = [rm, riderM, cm];
-
-      // --- Fetch route segments + ETA using utility functions ---
-      const [seg1Result, seg2Result] = await Promise.all([
-        fetchRouteWithETA(RESTAURANT_COORDS, effectiveRiderCoords),
-        fetchRouteWithETA(effectiveRiderCoords, customerCoords),
+      // ── Fetch both route segments in parallel ────────────────────────────
+      const [completedResult, remainingResult] = await Promise.all([
+        fetchRouteWithETA(RESTAURANT_COORDS, effectiveRider),
+        fetchRouteWithETA(effectiveRider, customerCoords),
       ]);
 
-      if (seg1Result.geometry) {
-        drawRoute(map, "route-seg1", seg1Result.geometry, "#ff5a3d", 0.9); // Feasto orange – completed leg
-      }
-      if (seg2Result.geometry) {
-        drawRoute(map, "route-seg2", seg2Result.geometry, "#efdcd3", 0.75); // muted – upcoming leg
+      // Completed leg – solid orange (restaurant → rider)
+      if (completedResult.geometry) {
+        drawCompletedRoute(map, "seg-completed", completedResult.geometry);
       }
 
-      // --- Set ETA from the rider → customer segment ---
-      if (seg2Result.eta) {
-        setEta(seg2Result.eta.etaMinutes);
+      // Remaining leg – animated dashed (rider → customer)
+      if (remainingResult.geometry) {
+        drawRemainingRoute(map, "seg-remaining", remainingResult.geometry);
+        startDashAnimation(map, "seg-remaining");
       }
 
-      // --- Fit map to show all three points ---
+      // ── ETA + distance info panel ────────────────────────────────────────
+      if (remainingResult.eta) {
+        setRouteInfo(remainingResult.eta);
+      }
+
+      // ── Fit camera to show all three points ─────────────────────────────
       const bounds = new maplibregl.LngLatBounds();
       bounds.extend(RESTAURANT_COORDS);
-      bounds.extend(effectiveRiderCoords);
+      bounds.extend(effectiveRider);
       bounds.extend(customerCoords);
-      map.fitBounds(bounds, { padding: 60, maxZoom: 15, duration: 1200 });
+      map.fitBounds(bounds, {
+        padding: { top: 80, bottom: 120, left: 60, right: 60 },
+        maxZoom: 15,
+        duration: 1400,
+        easing: (t) => t * (2 - t), // ease-out
+      });
     };
 
     run();
-  }, [mapReady, order, riderCoords]);
+  }, [mapReady, order, riderCoords, startDashAnimation]);
 
-  // -------------------------------------------------------------------------
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="dm-wrapper">
-      {/* Map status overlay */}
+
+      {/* Loading overlay */}
       {geocodeState === "loading" && (
         <div className="dm-overlay">
           <div className="dm-spinner" />
-          <span>Locating addresses…</span>
+          <span>Plotting your delivery route…</span>
         </div>
       )}
+
+      {/* Geocode error */}
       {geocodeState === "error" && (
         <div className="dm-overlay dm-overlay--warn">
-          <span>⚠️ Could not geocode delivery address</span>
+          <span>⚠️ Could not locate delivery address</span>
         </div>
       )}
 
-      {/* ETA badge */}
-      {eta && statusIndex < 3 && (
-        <div className="dm-eta-badge">
-          🛵 ~{eta} min away
-        </div>
-      )}
-
-      {/* Map container */}
+      {/* Map canvas */}
       <div ref={mapContainer} className="dm-map" />
+
+      {/* ── Premium route info panel (bottom of map) ─────────────────────── */}
+      {routeInfo && geocodeState === "done" && (
+        <div className="dm-info-panel">
+
+          {/* Delivered state */}
+          {statusIndex >= 3 ? (
+            <div className="dm-info-delivered">
+              <span className="dm-info-delivered__icon">✅</span>
+              <div>
+                <p className="dm-info-delivered__title">Order Delivered!</p>
+                <p className="dm-info-delivered__sub">Enjoy your meal 🎉</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* ETA chip */}
+              <div className="dm-info-chip dm-info-chip--eta">
+                <span className="dm-info-chip__icon">⏱️</span>
+                <div>
+                  <p className="dm-info-chip__value">~{routeInfo.etaMinutes} min</p>
+                  <p className="dm-info-chip__label">Estimated arrival</p>
+                </div>
+              </div>
+
+              <div className="dm-info-divider" />
+
+              {/* Distance chip */}
+              <div className="dm-info-chip dm-info-chip--dist">
+                <span className="dm-info-chip__icon">📍</span>
+                <div>
+                  <p className="dm-info-chip__value">{routeInfo.distanceKm} km</p>
+                  <p className="dm-info-chip__label">Distance remaining</p>
+                </div>
+              </div>
+
+              <div className="dm-info-divider" />
+
+              {/* Live badge */}
+              <div className="dm-info-live">
+                <span className="dm-info-live__dot" />
+                <span className="dm-info-live__text">LIVE</span>
+              </div>
+            </>
+          )}
+
+          {/* Route legend */}
+          <div className="dm-info-legend">
+            <span className="dm-legend-dot dm-legend-dot--done" />
+            <span>Completed</span>
+            <span className="dm-legend-dot dm-legend-dot--remaining" />
+            <span>Remaining</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
