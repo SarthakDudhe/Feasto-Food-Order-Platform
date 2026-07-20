@@ -268,4 +268,41 @@ const assignRider = async (req, res) => {
   }
 };
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider}
+// Live update rider location and/or status from rider portal/app
+const updateRiderLocation = async (req, res) => {
+  try {
+    const { orderId, riderLat, riderLng, status } = req.body;
+
+    if (!orderId) {
+      return res.json({ success: false, message: "orderId is required" });
+    }
+
+    const updatePayload = {
+      riderUpdatedAt: new Date(),
+    };
+
+    if (riderLat !== undefined && riderLng !== undefined &&
+        !isNaN(parseFloat(riderLat)) && !isNaN(parseFloat(riderLng))) {
+      updatePayload.riderLat = parseFloat(riderLat);
+      updatePayload.riderLng = parseFloat(riderLng);
+    }
+
+    if (status) {
+      updatePayload.status = status;
+    }
+
+    const order = await orderModel.findByIdAndUpdate(orderId, updatePayload, { new: true });
+
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    res.json({ success: true, message: "Rider location & status updated", data: order });
+  } catch (error) {
+    console.error(error.message);
+    res.json({ success: false, message: "Error updating rider location" });
+  }
+};
+
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation}
+

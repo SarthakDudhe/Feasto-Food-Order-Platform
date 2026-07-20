@@ -36,7 +36,9 @@ navigate("/")
     <ul className="nav-profile-dropdown">
       <li onClick={()=>navigate("/myorders")}><img src={assets.bag_icon} alt="" /><p>Orders</p></li>
       <hr />
-      <li onClick={logout}><img src={assets.logout_icon} alt="" />Logout</li>
+      <li onClick={()=>navigate("/rider")}><span style={{fontSize:'16px'}}>🛵</span><p>Rider Portal</p></li>
+      <hr />
+      <li onClick={logout}><img src={assets.logout_icon} alt="" /><p>Logout</p></li>
     </ul>
     </div>}
  

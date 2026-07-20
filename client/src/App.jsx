@@ -9,42 +9,38 @@ import LoginPopup from './components/LoginPopup/LoginPopup'
 import Verify from './pages/Verify/Verify'
 import MyOrder from './pages/MyOrder/MyOrder'
 import TrackOrder from './pages/TrackOrder/TrackOrder'
-
-
+import Rider from './pages/Rider/Rider'
 
 function App() {
+  const [showLogin, setShowLogin] = useState(false)
 
-const [showLogin,setShowLogin] = useState(false)
+  useEffect(() => {
+    document.body.classList.toggle('login-modal-open', showLogin)
 
-useEffect(() => {
-  document.body.classList.toggle('login-modal-open', showLogin)
-
-  return () => {
-    document.body.classList.remove('login-modal-open')
-  }
-}, [showLogin])
+    return () => {
+      document.body.classList.remove('login-modal-open')
+    }
+  }, [showLogin])
 
   return (
-<>
-    {showLogin ? <LoginPopup setShowLogin={setShowLogin}/> : <></>}
-<div className='app'>
-  <Navbar setShowLogin={setShowLogin}/>
-  <Routes>
-    <Route path='/' element={<Home/>}/>
-    <Route path='/cart' element={<Cart/>}/>
-    <Route path='/order' element={<PlaceOrder/>}/>
-    <Route path='/verify' element={<Verify/>}/>
-    <Route path='/myorders' element={<MyOrder/>}/>
-    <Route path='/track-order/:orderId' element={<TrackOrder/>}/>
-    {/* <Route path='/foodmate' element={<Foodbot/>}/> */}
-
-  </Routes>
-</div> 
-<Footer/>
-    
-</>
-
+    <>
+      {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
+      <div className='app'>
+        <Navbar setShowLogin={setShowLogin} />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/cart' element={<Cart />} />
+          <Route path='/order' element={<PlaceOrder />} />
+          <Route path='/verify' element={<Verify />} />
+          <Route path='/myorders' element={<MyOrder />} />
+          <Route path='/track-order/:orderId' element={<TrackOrder />} />
+          <Route path='/rider' element={<Rider />} />
+        </Routes>
+      </div>
+      <Footer />
+    </>
   )
 }
+
 
 export default App
