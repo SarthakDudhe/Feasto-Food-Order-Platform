@@ -83,14 +83,28 @@ function createMarkerEl(emoji, label, cls) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Get browser geolocation → returns Promise<[lng, lat] | null>
+// Tries high-accuracy first, falls back to low-accuracy on failure
 function getBrowserLocation() {
   return new Promise((resolve) => {
     if (!navigator.geolocation) { resolve(null); return; }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve([pos.coords.longitude, pos.coords.latitude]),
-      ()    => resolve(null),
-      { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
-    );
+
+    const tryGet = (highAccuracy) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve([pos.coords.longitude, pos.coords.latitude]),
+        (err) => {
+          // err.code 1 = PERMISSION_DENIED → no point retrying
+          if (err.code === 1 || !highAccuracy) {
+            resolve(null);
+          } else {
+            // POSITION_UNAVAILABLE or TIMEOUT → retry without high accuracy
+            tryGet(false);
+          }
+        },
+        { timeout: 10000, maximumAge: 0, enableHighAccuracy: highAccuracy }
+      );
+    };
+
+    tryGet(true);
   });
 }
 
@@ -102,11 +116,12 @@ export default function DeliveryMap({ order, statusIndex }) {
   const animFrameRef = useRef(null);
   const dashStepRef  = useRef(0);
 
-  const [mapReady, setMapReady]           = useState(false);
-  const [locState, setLocState]           = useState("idle"); // idle | requesting | loading | done | denied | error
-  const [routeInfo, setRouteInfo]         = useState(null);
-  const [customerCoords, setCustomerCoords] = useState(null);
-  const [usingFallback, setUsingFallback] = useState(false);
+  const [mapReady, setMapReady]     = useState(false);
+  const [locState, setLocState]     = useState("idle"); // idle|requesting|loading|done
+  const [routeInfo, setRouteInfo]   = useState(null);
+  // Single atomic location object — avoids race conditions between separate setState calls
+  const [locationData, setLocationData] = useState(null);
+  // locationData shape: { coords: [lng, lat], isFallback: boolean }
 
   const riderCoords =
     order.riderLat && order.riderLng ? [order.riderLng, order.riderLat] : null;
@@ -161,21 +176,20 @@ export default function DeliveryMap({ order, statusIndex }) {
     const coords = await getBrowserLocation();
 
     if (coords) {
-      setCustomerCoords(coords);
-      setUsingFallback(false);
-      setLocState("loading");
+      // ✅ Got real GPS — set atomically, no race condition
+      setLocationData({ coords, isFallback: false });
     } else {
-      // Browser denied or unavailable → use Andheri West fallback
-      setCustomerCoords(MUMBAI_FALLBACK.coords);
-      setUsingFallback(true);
-      setLocState("loading");
+      // ❌ Denied or unavailable → Andheri West demo
+      setLocationData({ coords: MUMBAI_FALLBACK.coords, isFallback: true });
     }
+    setLocState("loading");
   }, []);
 
-  // ── Draw map when we have customerCoords ─────────────────────────────────
+  // ── Draw map when we have locationData ───────────────────────────────────
   useEffect(() => {
-    if (!mapReady || !customerCoords || !mapRef.current) return;
+    if (!mapReady || !locationData || !mapRef.current) return;
     const map = mapRef.current;
+    const { coords: customerCoords, isFallback: usingFallback } = locationData;
 
     cancelAnimationFrame(animFrameRef.current);
     markersRef.current.forEach((m) => m.remove());
@@ -231,7 +245,7 @@ export default function DeliveryMap({ order, statusIndex }) {
     };
 
     draw();
-  }, [mapReady, customerCoords, riderCoords, usingFallback, order, startDashAnimation]);
+  }, [mapReady, locationData, riderCoords, order, startDashAnimation]);
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
@@ -247,8 +261,7 @@ export default function DeliveryMap({ order, statusIndex }) {
             <span>📡</span> Share My Location
           </button>
           <button className="dm-demo-btn" onClick={() => {
-            setCustomerCoords(MUMBAI_FALLBACK.coords);
-            setUsingFallback(true);
+            setLocationData({ coords: MUMBAI_FALLBACK.coords, isFallback: true });
             setLocState("loading");
           }}>
             Use Demo Location instead
