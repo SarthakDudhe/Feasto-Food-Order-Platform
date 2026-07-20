@@ -210,28 +210,15 @@ export default function Rider({ url }) {
     return (
       <div className="rider-auth-container">
         <form onSubmit={submitAuth} className="rider-auth-form">
-          <h2>{isLogin ? "Rider Login" : "Rider Registration"}</h2>
-          
-          {!isLogin && (
-            <>
-              <input type="text" name="name" placeholder="Full Name" onChange={handleAuthChange} required />
-              <input type="text" name="phone" placeholder="Phone Number" onChange={handleAuthChange} required />
-              <select name="vehicleType" onChange={handleAuthChange}>
-                <option value="Scooter">Scooter</option>
-                <option value="E-Bike">E-Bike</option>
-                <option value="Van">Van</option>
-                <option value="Walk">Walk</option>
-              </select>
-            </>
-          )}
+          <h2>Rider Login</h2>
           
           <input type="email" name="email" placeholder="Email Address" onChange={handleAuthChange} required />
           <input type="password" name="password" placeholder="Password" onChange={handleAuthChange} required />
           
-          <button type="submit" className="rider-auth-btn">{isLogin ? "Login" : "Register"}</button>
+          <button type="submit" className="rider-auth-btn">Login</button>
           
-          <p onClick={() => setIsLogin(!isLogin)} className="rider-auth-toggle">
-            {isLogin ? "Create a new Rider account" : "Already have an account? Login here"}
+          <p className="rider-auth-toggle">
+            To join our fleet, please apply through the main Feasto website.
           </p>
         </form>
       </div>

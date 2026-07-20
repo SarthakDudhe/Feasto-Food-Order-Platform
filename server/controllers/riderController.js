@@ -11,6 +11,9 @@ const loginRider = async (req, res) => {
         if (!rider) {
             return res.json({ success: false, message: "Rider doesn't exist" })
         }
+        if (!rider.isVerified) {
+            return res.json({ success: false, message: "Your account is pending admin approval." })
+        }
         const isMatch = await bcrypt.compare(password, rider.password);
         if (!isMatch) {
             return res.json({ success: false, message: "Invalid credentials" })
@@ -52,8 +55,8 @@ const registerRider = async (req, res) => {
             vehicleType: vehicleType || "Scooter"
         })
         const rider = await newRider.save()
-        const token = createToken(rider._id)
-        res.json({ success: true, token })
+        // Do not log them in automatically. They must wait for verification.
+        res.json({ success: true, message: "Registration successful. Pending admin approval." })
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: "Error" })
@@ -71,4 +74,21 @@ const listRiders = async (req, res) => {
     }
 }
 
-export { loginRider, registerRider, listRiders }
+// verify rider (Admin only)
+const verifyRider = async (req, res) => {
+    try {
+        const { riderId } = req.body;
+        const rider = await riderModel.findById(riderId);
+        if (!rider) {
+            return res.json({ success: false, message: "Rider not found" });
+        }
+        rider.isVerified = true;
+        await rider.save();
+        res.json({ success: true, message: "Rider successfully verified!" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error verifying rider" });
+    }
+}
+
+export { loginRider, registerRider, listRiders, verifyRider }

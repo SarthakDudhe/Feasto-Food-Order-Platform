@@ -6,7 +6,8 @@ const riderSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   vehicleType: { type: String, default: "Scooter" },
-  status: { type: String, default: "Available" }
+  status: { type: String, default: "Available" },
+  isVerified: { type: Boolean, default: false }
 }, { minimize: false });
 
 const riderModel = mongoose.models.rider || mongoose.model("rider", riderSchema);

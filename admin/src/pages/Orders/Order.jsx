@@ -20,7 +20,9 @@ const Order = ({url}) => {
     try {
       const response = await axios.get(url + "/api/rider/list")
       if (response.data.success) {
-        setRiders(response.data.data)
+        // Only show verified riders in the assignment dropdown
+        const verifiedRiders = response.data.data.filter(r => r.isVerified === true);
+        setRiders(verifiedRiders);
       }
     } catch (error) {
       console.error("Error fetching riders", error)

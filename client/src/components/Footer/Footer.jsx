@@ -22,6 +22,7 @@ const Footer = () => {
             <li><Link to="/">Home</Link></li>
             <li>About Us</li>
             <li>Privacy Policy</li>
+            <li><Link to="/rider-signup" style={{color:"#ff5a3d", fontWeight: "bold"}}>Join us as a Rider</Link></li>
           </ul>
         </div>
         <div className="footer-content-right">

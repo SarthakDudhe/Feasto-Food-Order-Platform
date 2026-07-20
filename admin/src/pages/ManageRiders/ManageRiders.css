@@ -1,0 +1,106 @@
+.manage-riders-page {
+  padding: 20px;
+}
+
+.manage-riders-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #666;
+}
+
+.riders-list-container {
+  margin-top: 30px;
+}
+
+.riders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.rider-profile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rider-profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+}
+
+.rider-profile-card.pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.rider-profile-card.verified {
+  border-left: 4px solid #10b981;
+}
+
+.rider-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.rider-card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.badge-verified {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.rider-details p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.rider-details strong {
+  color: #333;
+  width: 70px;
+  display: inline-block;
+}
+
+.rider-actions {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px dashed #eaeaea;
+}
+
+.btn-verify-rider {
+  width: 100%;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-verify-rider:hover {
+  background: #059669;
+}
