@@ -7,7 +7,4 @@ export default defineConfig({
   worker: {
     format: 'es', // Required for maplibre-gl Web Workers to bundle correctly
   },
-  optimizeDeps: {
-    exclude: ['maplibre-gl'], // Let Vite handle it as ESM directly
-  },
 })
