@@ -5,9 +5,12 @@ import "./DeliveryMap.css";
 import { geocodeAddress } from "../../utils/geocode";
 import { fetchRouteWithETA } from "../../utils/routing";
 
-// ─── Restaurant home base ────────────────────────────────────────────────────
-// Update to your actual restaurant coordinates [lng, lat]
-const RESTAURANT_COORDS = [72.8777, 19.076];
+// ─── Offsets to simulate restaurant + rider near customer's city ─────────────
+// Restaurant is placed ~2.2km NW of delivery address (always local)
+const RESTAURANT_OFFSET = { lng: -0.012, lat: 0.010 }; // ~1.3km W, ~1.1km N
+// If admin hasn't set rider GPS, rider is placed 40% along restaurant→customer path
+const RIDER_RATIO = 0.42;
+
 
 // ─── Animated dash sequence for the "remaining route" segment ────────────────
 const DASH_SEQUENCE = [
@@ -205,27 +208,32 @@ export default function DeliveryMap({ order, statusIndex }) {
       setGeocodeState("loading");
       setRouteInfo(null);
 
+      // 1. Geocode customer address — this is our anchor point
       const customerCoords = await geocodeAddress(order.address);
 
       if (!customerCoords) {
         setGeocodeState("error");
-        new maplibregl.Marker({ element: createMarkerEl("🍴", "Feasto Kitchen", "restaurant"), anchor: "bottom" })
-          .setLngLat(RESTAURANT_COORDS)
-          .addTo(map);
         return;
       }
 
       setGeocodeState("done");
 
-      // Rider midpoint fallback if admin hasn't set GPS yet
-      const effectiveRider = riderCoords ?? [
-        RESTAURANT_COORDS[0] * 0.6 + customerCoords[0] * 0.4,
-        RESTAURANT_COORDS[1] * 0.6 + customerCoords[1] * 0.4,
+      // 2. Derive restaurant coords relative to customer (always same city/area)
+      const restaurantCoords = [
+        customerCoords[0] + RESTAURANT_OFFSET.lng,
+        customerCoords[1] + RESTAURANT_OFFSET.lat,
       ];
+
+      // 3. Rider: use admin-set GPS if available, otherwise simulate along route
+      const effectiveRider = riderCoords ?? [
+        restaurantCoords[0] + (customerCoords[0] - restaurantCoords[0]) * RIDER_RATIO,
+        restaurantCoords[1] + (customerCoords[1] - restaurantCoords[1]) * RIDER_RATIO,
+      ];
+
 
       // ── Markers ─────────────────────────────────────────────────────────
       const rM = new maplibregl.Marker({ element: createMarkerEl("🍴", "Feasto Kitchen", "restaurant"), anchor: "bottom" })
-        .setLngLat(RESTAURANT_COORDS).addTo(map);
+        .setLngLat(restaurantCoords).addTo(map);
       const riM = new maplibregl.Marker({ element: createMarkerEl("🛵", order.riderName || "Rider", "rider"), anchor: "bottom" })
         .setLngLat(effectiveRider).addTo(map);
       const cM = new maplibregl.Marker({ element: createMarkerEl("🏠", "Your Home", "customer"), anchor: "bottom" })
@@ -235,9 +243,10 @@ export default function DeliveryMap({ order, statusIndex }) {
 
       // ── Fetch both route segments in parallel ────────────────────────────
       const [completedResult, remainingResult] = await Promise.all([
-        fetchRouteWithETA(RESTAURANT_COORDS, effectiveRider),
+        fetchRouteWithETA(restaurantCoords, effectiveRider),
         fetchRouteWithETA(effectiveRider, customerCoords),
       ]);
+
 
       // Completed leg – solid orange (restaurant → rider)
       if (completedResult.geometry) {
@@ -255,17 +264,17 @@ export default function DeliveryMap({ order, statusIndex }) {
         setRouteInfo(remainingResult.eta);
       }
 
-      // ── Fit camera to show all three points at STREET level ───────────────
+      // ── Fit camera — all 3 pins are local so this stays at street level ──
       const bounds = new maplibregl.LngLatBounds();
-      bounds.extend(RESTAURANT_COORDS);
+      bounds.extend(restaurantCoords);
       bounds.extend(effectiveRider);
       bounds.extend(customerCoords);
       map.fitBounds(bounds, {
-        padding: { top: 80, bottom: 130, left: 70, right: 70 },
-        minZoom: 14,   // ← always stay at street level, never country/city view
-        maxZoom: 16,   // ← never closer than a few blocks
+        padding: { top: 70, bottom: 130, left: 60, right: 60 },
+        minZoom: 14,   // street level minimum
+        maxZoom: 16,
         duration: 1400,
-        easing: (t) => t * (2 - t), // ease-out
+        easing: (t) => t * (2 - t),
       });
     };
 
