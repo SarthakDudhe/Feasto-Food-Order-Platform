@@ -17,6 +17,9 @@ const orderSchema = new mongoose.Schema({
   // ── Rider assignment & Validation ─────────────────────────────────
   riderId:          { type: mongoose.Schema.Types.ObjectId, ref: 'rider', default: null },
   riderName:        { type: String,  default: "" },
+  riderPhone:       { type: String,  default: "" },
+  deliveryOtp:      { type: String,  default: "" },
+  
   // ── Chat Messaging ──────────────────────────────────────────────
   chat: [
     {
@@ -24,8 +27,9 @@ const orderSchema = new mongoose.Schema({
       text: { type: String, required: true },
       timestamp: { type: Date, default: Date.now }
     }
-  ]
-}, { minimize: false });
+  ],
+
+  // GPS coordinates set by admin (or future rider app)
   // [lng, lat] in decimal degrees – used to place the live map pin
   riderLat:         { type: Number,  default: null },
   riderLng:         { type: Number,  default: null },
