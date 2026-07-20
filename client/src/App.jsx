@@ -10,6 +10,7 @@ import Verify from './pages/Verify/Verify'
 import MyOrder from './pages/MyOrder/MyOrder'
 import TrackOrder from './pages/TrackOrder/TrackOrder'
 import RiderSignup from './pages/RiderSignup/RiderSignup'
+import RiderDashboard from './pages/RiderDashboard/RiderDashboard'
 
 function App() {
   const [showLogin, setShowLogin] = useState(false)
@@ -35,6 +36,7 @@ function App() {
           <Route path='/myorders' element={<MyOrder />} />
           <Route path='/track-order/:orderId' element={<TrackOrder />} />
           <Route path='/rider-signup' element={<RiderSignup />} />
+          <Route path='/rider' element={<RiderDashboard />} />
         </Routes>
       </div>
       <Footer />

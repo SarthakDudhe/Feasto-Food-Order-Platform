@@ -17,10 +17,15 @@ const orderSchema = new mongoose.Schema({
   // ── Rider assignment & Validation ─────────────────────────────────
   riderId:          { type: mongoose.Schema.Types.ObjectId, ref: 'rider', default: null },
   riderName:        { type: String,  default: "" },
-  riderPhone:       { type: String,  default: "" },
-  deliveryOtp:      { type: String,  default: "" },
-
-  // GPS coordinates set by admin (or future rider app)
+  // ── Chat Messaging ──────────────────────────────────────────────
+  chat: [
+    {
+      sender: { type: String, enum: ["Customer", "Rider"], required: true },
+      text: { type: String, required: true },
+      timestamp: { type: Date, default: Date.now }
+    }
+  ]
+}, { minimize: false });
   // [lng, lat] in decimal degrees – used to place the live map pin
   riderLat:         { type: Number,  default: null },
   riderLng:         { type: Number,  default: null },

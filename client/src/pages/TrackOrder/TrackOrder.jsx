@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
 import DeliveryMap from "../../components/DeliveryMap/DeliveryMap";
+import io from "socket.io-client";
 import "./TrackOrder.css";
 
 export default function TrackOrder() {
@@ -16,57 +17,62 @@ export default function TrackOrder() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pollCount, setPollCount] = useState(0);
 
-  // In-app interactive rider chat modal state
+  // Real-time Chat state
   const [showChatModal, setShowChatModal] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    {
-      sender: "rider",
-      text: "Hi! I'm carrying your Feasto order. Let me know if you have any delivery instructions!",
-      time: "Just now"
-    }
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [inputMsg, setInputMsg] = useState("");
-  const [isRiderTyping, setIsRiderTyping] = useState(false);
   const chatBottomRef = useRef(null);
+  
+  // Socket ref to avoid re-creation
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    if (url) {
+      socketRef.current = io(url);
+      socketRef.current.on("receive_message", (data) => {
+        if (data.orderId === orderId) {
+          setChatMessages((prev) => [...prev, data]);
+        }
+      });
+    }
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
+  }, [url, orderId]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
     if (showChatModal) {
       chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [chatMessages, isRiderTyping, showChatModal]);
+  }, [chatMessages, showChatModal]);
 
-  const sendChatMessage = (textToSend) => {
+  const sendChatMessage = async (textToSend) => {
     const msgText = textToSend || inputMsg;
     if (!msgText || !msgText.trim()) return;
 
-    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setChatMessages((prev) => [...prev, { sender: "user", text: msgText.trim(), time: now }]);
+    const messageData = {
+      orderId,
+      sender: "Customer",
+      text: msgText.trim(),
+      timestamp: new Date()
+    };
+
+    // Update local immediately
+    setChatMessages((prev) => [...prev, messageData]);
     setInputMsg("");
 
-    // Simulate rider typing & response
-    setIsRiderTyping(true);
-    setTimeout(() => {
-      setIsRiderTyping(false);
-      let replyText = "Got it! I will follow your instructions 👍";
-      const lower = msgText.toLowerCase();
-      if (lower.includes("eta") || lower.includes("far") || lower.includes("when")) {
-        replyText = "I'm on my way! Should arrive in about 5 to 10 minutes 🛵";
-      } else if (lower.includes("door") || lower.includes("leave")) {
-        replyText = "Sure thing, I'll place the food packet right at your doorstep!";
-      } else if (lower.includes("ring") || lower.includes("bell")) {
-        replyText = "Noted! I'll give a quick ring when I'm outside.";
-      }
+    // Emit via socket
+    if (socketRef.current) {
+      socketRef.current.emit("send_message", messageData);
+    }
 
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          sender: "rider",
-          text: replyText,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
-    }, 1200);
+    // Save to DB
+    try {
+      await axios.post(`${url}/api/order/chat`, messageData, { headers: { token } });
+    } catch (err) {
+      console.error("Failed to save chat message", err);
+    }
   };
 
   // Status mapping to indices
@@ -95,6 +101,12 @@ export default function TrackOrder() {
       );
       if (response.data.success) {
         setOrder(response.data.data);
+        if (response.data.data.chat) {
+          setChatMessages(response.data.data.chat);
+        }
+        if (socketRef.current) {
+          socketRef.current.emit("join_order_room", orderId);
+        }
         setError("");
       } else {
         setError(response.data.message || "Failed to fetch order details.");
@@ -384,23 +396,13 @@ export default function TrackOrder() {
 
             <div className="inapp-chat-body">
               {chatMessages.map((msg, idx) => (
-                <div key={idx} className={`chat-bubble-row ${msg.sender}`}>
+                <div key={idx} className={`chat-bubble-row ${msg.sender === "Customer" ? "user" : "rider"}`}>
                   <div className="chat-bubble">
                     <p>{msg.text}</p>
-                    <span className="chat-time">{msg.time}</span>
+                    <span className="chat-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>
               ))}
-              {isRiderTyping && (
-                <div className="chat-bubble-row rider">
-                  <div className="chat-bubble typing-bubble">
-                    <span className="typing-dots">
-                      <span>.</span><span>.</span><span>.</span>
-                    </span>
-                    <span className="typing-text">Rider is typing</span>
-                  </div>
-                </div>
-              )}
               <div ref={chatBottomRef} />
             </div>
 

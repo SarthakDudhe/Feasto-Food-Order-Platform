@@ -1,53 +1,46 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import "./Rider.css";
+import io from "socket.io-client";
+import { Link } from "react-router-dom";
+import "./RiderDashboard.css";
 
-// Fixed Bandra Kitchen starting point
 const KITCHEN_COORDS = [72.8296, 19.0544];
+const url = "http://localhost:4000";
 
-export default function Rider({ url }) {
+const socket = io(url);
+
+export default function RiderDashboard() {
   const [token, setToken] = useState(localStorage.getItem("riderToken") || "");
   const [riderData, setRiderData] = useState(JSON.parse(localStorage.getItem("riderData")) || null);
   
-  // Auth state
-  const [isLogin, setIsLogin] = useState(true);
-  const [authData, setAuthData] = useState({ name: "", email: "", password: "", phone: "", vehicleType: "Scooter" });
-  
+  const [authData, setAuthData] = useState({ email: "", password: "" });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   
   const [activeSimulations, setActiveSimulations] = useState({});
   const simulationStepsRef = useRef({});
 
-  // OTP Modal State
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpInput, setOtpInput] = useState("");
   const [otpOrderId, setOtpOrderId] = useState(null);
 
-  // Authentication Handlers
+  // Chat states: map of orderId -> array of messages
+  const [chats, setChats] = useState({});
+  const [chatInputs, setChatInputs] = useState({});
+
   const handleAuthChange = (e) => {
     setAuthData({ ...authData, [e.target.name]: e.target.value });
   };
 
   const submitAuth = async (e) => {
     e.preventDefault();
-    const endpoint = isLogin ? "/api/rider/login" : "/api/rider/register";
     try {
-      const res = await axios.post(url + endpoint, authData);
+      const res = await axios.post(url + "/api/rider/login", authData);
       if (res.data.success) {
         setToken(res.data.token);
         localStorage.setItem("riderToken", res.data.token);
-        if (res.data.rider) {
-            setRiderData(res.data.rider);
-            localStorage.setItem("riderData", JSON.stringify(res.data.rider));
-        } else if (!isLogin) {
-            // After register, it might not return rider data, just token
-            // Simplest is to force them to login after register or we fetch profile
-            alert("Registration successful, please login.");
-            setIsLogin(true);
-            setToken("");
-            localStorage.removeItem("riderToken");
-        }
+        setRiderData(res.data.rider);
+        localStorage.setItem("riderData", JSON.stringify(res.data.rider));
       } else {
         alert(res.data.message);
       }
@@ -64,15 +57,28 @@ export default function Rider({ url }) {
     localStorage.removeItem("riderData");
   };
 
-  // Fetch assigned orders for this rider
   const fetchAssignedOrders = async () => {
     if (!riderData || !riderData._id) return;
     try {
       const res = await axios.get(`${url}/api/order/list`);
       if (res.data && res.data.success) {
-        // Filter orders assigned to this rider
         const assigned = res.data.data.filter(o => o.riderId === riderData._id);
         setOrders(assigned);
+        
+        // Initialize chats for assigned orders
+        const newChats = { ...chats };
+        assigned.forEach(o => {
+          if (!newChats[o._id]) {
+             newChats[o._id] = o.chat || [];
+             socket.emit("join_order_room", o._id);
+          } else {
+             // Overwrite if newer from server
+             if (o.chat && o.chat.length > newChats[o._id].length) {
+               newChats[o._id] = o.chat;
+             }
+          }
+        });
+        setChats(newChats);
       }
     } catch (err) {
       console.error("Error fetching orders for rider:", err);
@@ -85,18 +91,29 @@ export default function Rider({ url }) {
     if (token && riderData) {
       setLoading(true);
       fetchAssignedOrders();
-      const pollInterval = setInterval(fetchAssignedOrders, 6000);
-      return () => clearInterval(pollInterval);
-    }
-  }, [token, riderData, url]);
+      const pollInterval = setInterval(fetchAssignedOrders, 10000); // Polling every 10s for new orders
 
+      // Socket listen for messages
+      socket.on("receive_message", (data) => {
+        setChats((prevChats) => {
+          const orderChats = prevChats[data.orderId] || [];
+          return {
+            ...prevChats,
+            [data.orderId]: [...orderChats, data]
+          };
+        });
+      });
+
+      return () => {
+        clearInterval(pollInterval);
+        socket.off("receive_message");
+      };
+    }
+  }, [token, riderData]);
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
-      const res = await axios.post(`${url}/api/order/status`, {
-        orderId,
-        status: newStatus,
-      });
+      const res = await axios.post(`${url}/api/order/status`, { orderId, status: newStatus });
       if (res.data.success) {
         fetchAssignedOrders();
       }
@@ -105,7 +122,32 @@ export default function Rider({ url }) {
     }
   };
 
-  // OTP Verification
+  const handleSendMessage = async (orderId) => {
+    const text = chatInputs[orderId];
+    if (!text || text.trim() === "") return;
+
+    const messageData = {
+      orderId,
+      sender: "Rider",
+      text,
+      timestamp: new Date()
+    };
+
+    // Emit to room
+    socket.emit("send_message", messageData);
+
+    // Save locally
+    setChats(prev => ({
+      ...prev,
+      [orderId]: [...(prev[orderId] || []), messageData]
+    }));
+
+    // Save to DB
+    await axios.post(`${url}/api/order/chat`, messageData);
+
+    setChatInputs(prev => ({ ...prev, [orderId]: "" }));
+  };
+
   const openOtpModal = (orderId) => {
     setOtpOrderId(orderId);
     setShowOtpModal(true);
@@ -123,7 +165,6 @@ export default function Rider({ url }) {
         setShowOtpModal(false);
         fetchAssignedOrders();
         
-        // Stop simulation if running
         if (activeSimulations[otpOrderId]) {
             clearInterval(activeSimulations[otpOrderId]);
             setActiveSimulations((prev) => {
@@ -141,7 +182,6 @@ export default function Rider({ url }) {
       alert("Error verifying OTP");
     }
   };
-
 
   const toggleLiveSimulation = (order) => {
     const orderId = order._id;
@@ -179,7 +219,6 @@ export default function Rider({ url }) {
           orderId,
           riderLat: currLat,
           riderLng: currLng,
-          // DO NOT set to delivered automatically, require OTP!
           status: "Out for delivery",
         });
       } catch (err) {
@@ -211,15 +250,12 @@ export default function Rider({ url }) {
       <div className="rider-auth-container">
         <form onSubmit={submitAuth} className="rider-auth-form">
           <h2>Rider Login</h2>
-          
           <input type="email" name="email" placeholder="Email Address" onChange={handleAuthChange} required />
           <input type="password" name="password" placeholder="Password" onChange={handleAuthChange} required />
-          
           <button type="submit" className="rider-auth-btn">Login</button>
-          
-          <p className="rider-auth-toggle">
-            To join our fleet, please apply through the main Feasto website.
-          </p>
+          <div style={{ textAlign: "center", marginTop: "10px" }}>
+            <Link to="/rider-signup" style={{ color: "#ff5a3d", fontSize: "13px" }}>Not a rider yet? Apply here</Link>
+          </div>
         </form>
       </div>
     );
@@ -256,7 +292,6 @@ export default function Rider({ url }) {
           <h1>Welcome back, {riderData.name}</h1>
           <p>Real-time order management and live GPS tracking.</p>
         </div>
-
         <div className="rider-header-right">
           <button onClick={logout} className="rider-logout-btn">Logout</button>
         </div>
@@ -276,7 +311,7 @@ export default function Rider({ url }) {
         <h2>Your Deliveries</h2>
 
         {loading ? (
-          <div className="rider-loading"><p>Loading...</p></div>
+          <div style={{ padding: "60px 0", textAlign: "center" }}><p>Loading...</p></div>
         ) : orders.length > 0 ? (
           <div className="rider-orders-grid">
             {orders.map((order) => {
@@ -309,7 +344,6 @@ export default function Rider({ url }) {
 
                   {order.notes && (
                     <div className="rider-notes-box">
-                      <span className="notes-icon">🍳</span>
                       <div>
                         <strong>Kitchen & Delivery Note:</strong>
                         <p>"{order.notes}"</p>
@@ -325,7 +359,6 @@ export default function Rider({ url }) {
                     >
                       📦 Picked Up
                     </button>
-
                     <button
                       disabled={isDelivered}
                       onClick={() => toggleLiveSimulation(order)}
@@ -333,7 +366,6 @@ export default function Rider({ url }) {
                     >
                       {isSimulating ? "🛑 Stop Drive Sim" : "🚀 Start Live Drive Sim"}
                     </button>
-
                     <button
                       disabled={isDelivered || order.status !== "Out for delivery"}
                       onClick={() => openOtpModal(order._id)}
@@ -349,13 +381,34 @@ export default function Rider({ url }) {
                       <span>Broadcasting live GPS...</span>
                     </div>
                   )}
+
+                  {/* CHAT BOX */}
+                  <div className="chat-container">
+                    <div className="chat-history">
+                      {(chats[order._id] || []).map((msg, i) => (
+                        <div key={i} className={`chat-msg ${msg.sender === "Rider" ? "msg-rider" : "msg-customer"}`}>
+                          <strong>{msg.sender}: </strong> {msg.text}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="chat-input-row">
+                      <input 
+                        type="text" 
+                        placeholder="Message customer..." 
+                        value={chatInputs[order._id] || ""}
+                        onChange={(e) => setChatInputs(prev => ({ ...prev, [order._id]: e.target.value }))}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(order._id)}
+                      />
+                      <button onClick={() => handleSendMessage(order._id)}>Send</button>
+                    </div>
+                  </div>
+
                 </div>
               );
             })}
           </div>
         ) : (
           <div className="no-assigned-orders">
-            <span className="empty-icon">🛵</span>
             <h3>No Active Deliveries Assigned</h3>
             <p>Wait for the Admin to assign you new orders.</p>
           </div>

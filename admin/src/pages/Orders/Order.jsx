@@ -56,7 +56,7 @@ const Order = ({url}) => {
   const assignRiderHandler = async (orderId, riderId) => {
     if (!riderId) return;
     const riderInfo = riders.find(r => r._id === riderId) || {};
-    const response = await axios.post(url + "/api/order/assign-rider", {
+    const response = await axios.post(url + "/api/order/assign", {
       orderId,
       riderId,
       riderName: riderInfo.name || "",

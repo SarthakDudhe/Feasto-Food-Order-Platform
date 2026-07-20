@@ -332,4 +332,28 @@ const verifyDeliveryOtp = async (req, res) => {
   }
 }
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation,verifyDeliveryOtp}
+// Add a chat message
+const addChatMessage = async (req, res) => {
+  try {
+    const { orderId, sender, text } = req.body;
+    if (!orderId || !sender || !text) {
+      return res.json({ success: false, message: "orderId, sender, and text are required" });
+    }
+    
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    const message = { sender, text, timestamp: new Date() };
+    order.chat.push(message);
+    await order.save();
+    
+    res.json({ success: true, message: "Chat added", chat: order.chat });
+  } catch (error) {
+    console.error(error.message);
+    res.json({ success: false, message: "Error adding chat" });
+  }
+}
+
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation,verifyDeliveryOtp,addChatMessage}

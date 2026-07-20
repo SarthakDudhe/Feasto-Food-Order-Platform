@@ -22,10 +22,6 @@ const Sidebar = () => {
         <img src={assets.parcel_icon} alt="" />
         <p>Orders</p>
     </NavLink>
-        <NavLink to="/rider" className="sidebar-option">
-          <img src={assets.bag_icon} alt="" />
-          <p>Rider Portal</p>
-        </NavLink>
         <NavLink to="/manage-riders" className="sidebar-option">
           <img src={assets.order_icon} alt="" />
           <p>Manage Riders</p>

@@ -5,7 +5,6 @@ import Add from './pages/Add/Add'
 import List from './pages/List/List'
 import Order from './pages/Orders/Order'
 import Dashboard from './pages/Dashboard/Dashboard'
-import Rider from './pages/Rider/Rider'
 import ManageRiders from './pages/ManageRiders/ManageRiders'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,7 +29,6 @@ function App() {
         <Route path='/add' element={<Add url={url}/>}  />
         <Route path='/list' element={<List url={url}/>}  />
         <Route path='/orders' element={<Order url={url}/>} />
-        <Route path='/rider' element={<Rider url={url}/>} />
         <Route path='/manage-riders' element={<ManageRiders url={url}/>} />
       </Routes>
 
