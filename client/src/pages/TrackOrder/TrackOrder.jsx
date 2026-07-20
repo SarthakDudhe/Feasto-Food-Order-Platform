@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
+import DeliveryMap from "../../components/DeliveryMap/DeliveryMap";
 import "./TrackOrder.css";
 
 export default function TrackOrder() {
@@ -113,16 +114,6 @@ export default function TrackOrder() {
 
   const currentStatusIndex = getStatusIndex(order.status);
 
-  // Rider coordinates along our custom curve path based on status index
-  const riderPositions = [
-    { x: 70, y: 150, rotation: -20 },   // Placed
-    { x: 230, y: 90, rotation: 10 },   // Food Processing
-    { x: 440, y: 190, rotation: -10 },  // Out for delivery
-    { x: 630, y: 150, rotation: 0 },    // Delivered
-  ];
-
-  const currentRiderPos = riderPositions[currentStatusIndex];
-
   const steps = [
     {
       title: "Order Placed",
@@ -205,90 +196,11 @@ export default function TrackOrder() {
       </div>
 
       <div className="tracker-grid">
-        {/* Left Side: Interactive SVG Map and Timeline */}
+        {/* Left Side: Real Map and Timeline */}
         <div className="tracker-main-card">
-          
-          {/* Animated SVG Route Map */}
-          <div className="svg-map-container">
-            <div className="map-labels">
-              <span className="label-restaurant">Feasto Kitchen</span>
-              <span className="label-courier">On the Road</span>
-              <span className="label-home">Your House</span>
-            </div>
 
-            <svg viewBox="0 0 700 250" className="delivery-svg">
-              <defs>
-                <linearGradient id="route-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.2" />
-                  <stop offset="50%" stopColor="var(--accent)" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#2ec4b6" stopOpacity="0.2" />
-                </linearGradient>
-                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="6" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
-
-              {/* Landscape Hills background */}
-              <path d="M0,230 Q150,180 300,220 T600,200 T700,230 L700,250 L0,250 Z" fill="#fff8f5" opacity="0.5" />
-              <path d="M0,240 Q250,210 500,230 T700,240 L700,250 L0,250 Z" fill="#fff3ed" opacity="0.8" />
-
-              {/* Road Path: A elegant curve */}
-              <path
-                id="road-path"
-                d="M 70,150 C 150,70 300,250 440,190 S 550,100 630,150"
-                fill="none"
-                stroke="var(--border)"
-                strokeWidth="10"
-                strokeLinecap="round"
-              />
-
-              {/* Inner dashed line indicating motion */}
-              <path
-                d="M 70,150 C 150,70 300,250 440,190 S 550,100 630,150"
-                fill="none"
-                stroke={order.status === "Delivered" ? "#2ec4b6" : "var(--accent)"}
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray="8 6"
-                className="animated-road-dash"
-              />
-
-              {/* Landmark Nodes */}
-              {/* Restaurant node */}
-              <g transform="translate(70,150)" className="map-node">
-                <circle r="22" fill="var(--surface-strong)" stroke="var(--border)" strokeWidth="3" />
-                <circle r="16" fill="var(--accent-soft)" />
-                <text y="5" fontSize="18" textAnchor="middle">🍳</text>
-              </g>
-
-              {/* Transit node */}
-              <g transform="translate(360,165)" className="map-node">
-                <circle r="18" fill="var(--surface-strong)" stroke="var(--border)" strokeWidth="2" />
-                <circle r="12" fill="#fff0eb" />
-                <text y="4" fontSize="13" textAnchor="middle">🛣️</text>
-              </g>
-
-              {/* Destination node */}
-              <g transform="translate(630,150)" className="map-node">
-                <circle r="22" fill="var(--surface-strong)" stroke={currentStatusIndex === 3 ? "#2ec4b6" : "var(--border)"} strokeWidth="3" className={currentStatusIndex === 3 ? "pulse-ring" : ""} />
-                <circle r="16" fill={currentStatusIndex === 3 ? "#e8fcf6" : "#f4f1ef"} />
-                <text y="5" fontSize="18" textAnchor="middle">🏠</text>
-              </g>
-
-              {/* Active Delivery Rider (Moto / Courier Icon) */}
-              <g
-                transform={`translate(${currentRiderPos.x}, ${currentRiderPos.y}) rotate(${currentRiderPos.rotation})`}
-                className="rider-group"
-                style={{ transition: "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
-              >
-                <circle r="24" fill="var(--accent)" filter="url(#glow)" className="rider-glow" />
-                <circle r="20" fill="var(--accent-dark)" />
-                {/* Custom inline scooter drawing inside group */}
-                <text y="6" fontSize="20" textAnchor="middle" transform="scale(-1, 1)">🛵</text>
-              </g>
-            </svg>
-          </div>
+          {/* 🗺️ Real MapLibre Delivery Map */}
+          <DeliveryMap order={order} statusIndex={currentStatusIndex} />
 
           {/* Stepper Timeline */}
           <div className="stepper-timeline">
