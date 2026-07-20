@@ -232,14 +232,34 @@ const getOrderAnalytics = async (req, res) => {
   }
 };
 
-// Assign a delivery rider to an order
+// Assign a delivery rider to an order (with phone & GPS location)
 const assignRider = async (req, res) => {
   try {
-    const { orderId, riderName } = req.body;
-    const order = await orderModel.findByIdAndUpdate(orderId, { riderName }, { new: true });
+    const { orderId, riderName, riderPhone, riderLat, riderLng } = req.body;
+
+    if (!orderId || !riderName) {
+      return res.json({ success: false, message: "orderId and riderName are required" });
+    }
+
+    const updatePayload = {
+      riderName,
+      riderPhone: riderPhone || "",
+      riderUpdatedAt: new Date(),
+    };
+
+    // Only update coordinates if both are provided and are valid numbers
+    if (riderLat !== undefined && riderLng !== undefined &&
+        !isNaN(parseFloat(riderLat)) && !isNaN(parseFloat(riderLng))) {
+      updatePayload.riderLat = parseFloat(riderLat);
+      updatePayload.riderLng = parseFloat(riderLng);
+    }
+
+    const order = await orderModel.findByIdAndUpdate(orderId, updatePayload, { new: true });
+
     if (!order) {
       return res.json({ success: false, message: "Order not found" });
     }
+
     res.json({ success: true, message: "Rider assigned successfully", data: order });
   } catch (error) {
     console.error(error.message);
