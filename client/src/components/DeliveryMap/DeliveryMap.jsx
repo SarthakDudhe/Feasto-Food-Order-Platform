@@ -92,12 +92,15 @@ export default function DeliveryMap({ order, statusIndex }) {
   const [mapReady,   setMapReady]   = useState(false);
   const [phase,      setPhase]      = useState("idle"); // idle|requesting|loading|done
   const [routeInfo,  setRouteInfo]  = useState(null);
-  // Single atomic location state — no separate isFallback useState to avoid race conditions
   const [locData,    setLocData]    = useState(null);
-  // locData = { coords:[lng,lat], isFallback:boolean } | null
 
-  const riderCoords = (order.riderLat && order.riderLng)
-    ? [order.riderLng, order.riderLat] : null;
+  // ―― Extract STABLE PRIMITIVES from order ――――――――――――――――――――――――――――――――
+  // Using primitives (not the order object) in the dep array prevents the effect
+  // from re-running on every server poll that returns a new object reference.
+  const orderId    = order._id;
+  const riderLat   = order.riderLat  ?? null;
+  const riderLng   = order.riderLng  ?? null;
+  const riderName  = order.riderName ?? "";
 
   // ── Dash animation ──────────────────────────────────────────────────────────
   const animateDash = useCallback((map, layerId) => {
@@ -155,26 +158,30 @@ export default function DeliveryMap({ order, statusIndex }) {
   useEffect(() => {
     if (!mapReady || !locData || !mapRef.current) return;
     const map = mapRef.current;
-    const { coords: custCoords, isFallback } = locData;  // destructure once — no stale closures
 
+    // Cancel previous animation and clear old markers on each re-run
     cancelAnimationFrame(rafRef.current);
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
     setRouteInfo(null);
 
+    const { coords: custCoords, isFallback } = locData;
+
+    // Rider point: use admin-set GPS primitives, else simulate 42% along route
+    const riderPt = (riderLat && riderLng)
+      ? [riderLng, riderLat]
+      : [
+          RESTAURANT.coords[0] + (custCoords[0] - RESTAURANT.coords[0]) * 0.42,
+          RESTAURANT.coords[1] + (custCoords[1] - RESTAURANT.coords[1]) * 0.42,
+        ];
+
     const draw = async () => {
       const restCoords = RESTAURANT.coords;
-
-      // Rider: admin GPS or 42% along route
-      const riderPt = riderCoords ?? [
-        restCoords[0] + (custCoords[0] - restCoords[0]) * 0.42,
-        restCoords[1] + (custCoords[1] - restCoords[1]) * 0.42,
-      ];
 
       // Place markers
       const m1 = new maplibregl.Marker({ element: mkMarker("🍴", RESTAURANT.name, "restaurant"), anchor:"bottom" })
         .setLngLat(restCoords).addTo(map);
-      const m2 = new maplibregl.Marker({ element: mkMarker("🛵", order.riderName || "Your Rider", "rider"), anchor:"bottom" })
+      const m2 = new maplibregl.Marker({ element: mkMarker("🛵", riderName || "Your Rider", "rider"), anchor:"bottom" })
         .setLngLat(riderPt).addTo(map);
       const m3 = new maplibregl.Marker({ element: mkMarker("📍", isFallback ? "Demo Location" : "Your Location", "customer"), anchor:"bottom" })
         .setLngLat(custCoords).addTo(map);
@@ -210,7 +217,7 @@ export default function DeliveryMap({ order, statusIndex }) {
     };
 
     draw();
-  }, [mapReady, locData, riderCoords, order, animateDash]);
+  }, [mapReady, locData, riderLat, riderLng, riderName, orderId, animateDash]);
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
