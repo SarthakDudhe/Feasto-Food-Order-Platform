@@ -158,10 +158,12 @@ export default function DeliveryMap({ order, statusIndex }) {
 
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      // CARTO Positron – clean, minimal, great for route highlighting
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      // CARTO Voyager – detailed street labels, perfect for delivery tracking
+      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
       center: RESTAURANT_COORDS,
-      zoom: 13,
+      zoom: 15,       // Street level by default
+      minZoom: 13,    // Never zoom out past neighbourhood level
+      maxZoom: 18,    // Never go closer than building level
       attributionControl: false,
       pitchWithRotate: false,
     });
@@ -253,14 +255,15 @@ export default function DeliveryMap({ order, statusIndex }) {
         setRouteInfo(remainingResult.eta);
       }
 
-      // ── Fit camera to show all three points ─────────────────────────────
+      // ── Fit camera to show all three points at STREET level ───────────────
       const bounds = new maplibregl.LngLatBounds();
       bounds.extend(RESTAURANT_COORDS);
       bounds.extend(effectiveRider);
       bounds.extend(customerCoords);
       map.fitBounds(bounds, {
-        padding: { top: 80, bottom: 120, left: 60, right: 60 },
-        maxZoom: 15,
+        padding: { top: 80, bottom: 130, left: 70, right: 70 },
+        minZoom: 14,   // ← always stay at street level, never country/city view
+        maxZoom: 16,   // ← never closer than a few blocks
         duration: 1400,
         easing: (t) => t * (2 - t), // ease-out
       });
