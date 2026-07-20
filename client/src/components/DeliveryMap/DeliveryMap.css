@@ -8,6 +8,89 @@
   box-shadow: 0 4px 20px rgba(76, 42, 31, 0.08);
 }
 
+/* ─── Location permission prompt ───────────────────────────────────────────── */
+.dm-location-prompt {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(160deg, #fff9f5 0%, #fff3ed 100%);
+  padding: 32px 28px;
+  text-align: center;
+}
+
+.dm-prompt-icon {
+  font-size: 42px;
+  animation: dm-bounce 2s ease-in-out infinite;
+}
+@keyframes dm-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+.dm-location-prompt h4 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.dm-location-prompt p {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 300px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dm-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 90, 61, 0.3);
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+.dm-share-btn:hover {
+  background: var(--accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 90, 61, 0.35);
+}
+
+.dm-demo-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.dm-demo-btn:hover { color: var(--accent-dark); }
+
+/* Fallback notice in info panel */
+.dm-info-fallback {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: italic;
+  margin-right: auto;
+}
+
+
 /* ─── Map canvas ───────────────────────────────────────────────────────────── */
 .dm-map {
   width: 100%;
