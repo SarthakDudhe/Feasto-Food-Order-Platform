@@ -286,6 +286,12 @@ export default function TrackOrder() {
               <span className="label">Contact</span>
               <span className="val">📞 {order.address.phone}</span>
             </div>
+            {order.notes && (
+              <div className="address-info-row kitchen-note-highlight">
+                <span className="label">🍳 Kitchen Note</span>
+                <span className="val note-text">"{order.notes}"</span>
+              </div>
+            )}
           </div>
 
           {/* Delivery Rider Details */}

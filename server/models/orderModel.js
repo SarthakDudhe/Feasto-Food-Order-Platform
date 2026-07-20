@@ -11,6 +11,9 @@ const orderSchema = new mongoose.Schema({
   date:             { type: Date,    default: Date.now },
   payment:          { type: Boolean, default: false  },
 
+  // Customer notes / cooking instructions (e.g., "Less spicy, no onions")
+  notes:            { type: String,  default: "" },
+
   // ── Rider assignment ────────────────────────────────────────────
   riderName:        { type: String,  default: "" },
 

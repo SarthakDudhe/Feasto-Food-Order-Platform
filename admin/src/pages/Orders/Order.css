@@ -5,6 +5,36 @@
   min-height: auto;
 }
 
+/* Kitchen notes styling */
+.kitchen-notes-highlight {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #fff8f0;
+  border-left: 4px solid var(--accent, #ff5a3d);
+  border-radius: 8px;
+}
+
+.kitchen-notes-text {
+  color: #c0392b !important;
+  font-weight: 700 !important;
+  font-style: italic;
+}
+
+.kot-notes {
+  margin: 8px 0;
+  padding: 6px 8px;
+  background: #fff0eb;
+  border: 1px dashed #ff5a3d;
+  border-radius: 4px;
+}
+
+.kot-notes-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #d35400;
+  margin-top: 4px;
+}
+
 /* Control Toolbar styling */
 .order-control-bar {
   display: flex;

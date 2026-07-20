@@ -22,6 +22,7 @@ const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173"
         items:req.body.items,
         amount:orderAmount,
         address:req.body.address,
+        notes:req.body.notes || "",
         coupon:coupon ? {
             code:coupon.code,
             discount

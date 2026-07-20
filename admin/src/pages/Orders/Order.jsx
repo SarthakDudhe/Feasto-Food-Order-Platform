@@ -285,6 +285,12 @@ const Order = ({url}) => {
                       {selectedOrder.address.street}, {selectedOrder.address.city}, {selectedOrder.address.state}, {selectedOrder.address.country} - {selectedOrder.address.pincode}
                     </span>
                   </div>
+                  {selectedOrder.notes && (
+                    <div className="detail-field kitchen-notes-highlight">
+                      <span className="field-label">🍳 Chef Notes:</span>
+                      <span className="field-value kitchen-notes-text">"{selectedOrder.notes}"</span>
+                    </div>
+                  )}
                   <div className="detail-field-action">
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -413,6 +419,15 @@ const Order = ({url}) => {
               </tbody>
             </table>
           </div>
+          {activePrintOrder.notes && (
+            <>
+              <hr />
+              <div className="kot-notes">
+                <p><strong>⚠️ KITCHEN INSTRUCTIONS / CHEF NOTES:</strong></p>
+                <p className="kot-notes-text">"{activePrintOrder.notes}"</p>
+              </div>
+            </>
+          )}
           {activePrintOrder.riderName && (
             <>
               <hr />

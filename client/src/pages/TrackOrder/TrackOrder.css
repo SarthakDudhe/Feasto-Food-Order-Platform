@@ -445,6 +445,27 @@
   max-width: 65%;
 }
 
+.kitchen-note-highlight {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  background: #fff8f0;
+  padding: 10px;
+  border-radius: 10px;
+  border-left: 3px solid var(--accent);
+}
+
+.kitchen-note-highlight .label {
+  color: var(--accent-dark) !important;
+  font-weight: 800 !important;
+}
+
+.kitchen-note-highlight .note-text {
+  color: var(--text) !important;
+  font-style: italic;
+  font-weight: 700 !important;
+}
+
 /* Action button styles */
 .sidebar-actions {
   display: flex;
