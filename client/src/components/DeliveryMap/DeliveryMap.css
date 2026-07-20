@@ -276,6 +276,7 @@
   cursor: default;
   user-select: none;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.22));
+  z-index: 100;
 }
 
 .dm-marker__bubble {

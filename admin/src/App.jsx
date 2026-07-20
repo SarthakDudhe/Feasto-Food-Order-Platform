@@ -5,6 +5,7 @@ import Add from './pages/Add/Add'
 import List from './pages/List/List'
 import Order from './pages/Orders/Order'
 import Dashboard from './pages/Dashboard/Dashboard'
+import Rider from './pages/Rider/Rider'
 import { ToastContainer } from 'react-toastify';
 
 
@@ -27,6 +28,7 @@ function App() {
         <Route path='/add' element={<Add url={url}/>}  />
         <Route path='/list' element={<List url={url}/>}  />
         <Route path='/order' element={<Order url={url}/>}  />
+        <Route path='/rider' element={<Rider url={url}/>}  />
       </Routes>
 
   </div>

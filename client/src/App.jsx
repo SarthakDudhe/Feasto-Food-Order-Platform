@@ -9,7 +9,6 @@ import LoginPopup from './components/LoginPopup/LoginPopup'
 import Verify from './pages/Verify/Verify'
 import MyOrder from './pages/MyOrder/MyOrder'
 import TrackOrder from './pages/TrackOrder/TrackOrder'
-import Rider from './pages/Rider/Rider'
 
 function App() {
   const [showLogin, setShowLogin] = useState(false)
@@ -34,7 +33,6 @@ function App() {
           <Route path='/verify' element={<Verify />} />
           <Route path='/myorders' element={<MyOrder />} />
           <Route path='/track-order/:orderId' element={<TrackOrder />} />
-          <Route path='/rider' element={<Rider />} />
         </Routes>
       </div>
       <Footer />

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { StoreContext } from "../../context/StoreContext";
 import "./Rider.css";
 
 const RIDERS_LIST = [
@@ -13,8 +12,7 @@ const RIDERS_LIST = [
 // Fixed Bandra Kitchen starting point
 const KITCHEN_COORDS = [72.8296, 19.0544];
 
-export default function Rider() {
-  const { url } = useContext(StoreContext);
+export default function Rider({ url }) {
   const [selectedRider, setSelectedRider] = useState(RIDERS_LIST[0]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -20,7 +20,6 @@ const Footer = () => {
           <h2>Feasto</h2>
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/rider">Rider Portal 🛵</Link></li>
             <li>About Us</li>
             <li>Privacy Policy</li>
           </ul>

@@ -22,6 +22,10 @@ const Sidebar = () => {
         <img src={assets.parcel_icon} alt="" />
         <p>Orders</p>
     </NavLink>
+      <NavLink to="/rider" className="sidebar-option">
+        <span style={{ fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" }}>🛵</span>
+        <p>Rider</p>
+    </NavLink>
 </div>
     </div>
   )
