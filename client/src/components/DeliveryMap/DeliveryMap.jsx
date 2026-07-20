@@ -163,7 +163,7 @@ export default function DeliveryMap({ order, statusIndex }) {
       container: mapContainer.current,
       // CARTO Voyager – detailed street labels, perfect for delivery tracking
       style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-      center: RESTAURANT_COORDS,
+      center: [78.9629, 20.5937], // safe default — fitBounds overrides this after geocoding
       zoom: 15,       // Street level by default
       minZoom: 13,    // Never zoom out past neighbourhood level
       maxZoom: 18,    // Never go closer than building level
