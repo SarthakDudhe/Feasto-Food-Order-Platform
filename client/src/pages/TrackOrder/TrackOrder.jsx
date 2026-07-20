@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
@@ -15,11 +15,58 @@ export default function TrackOrder() {
   const [error, setError] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pollCount, setPollCount] = useState(0);
-  const [riderMessageSent, setRiderMessageSent] = useState(false);
 
-  const handleSendMessage = () => {
-    setRiderMessageSent(true);
-    setTimeout(() => setRiderMessageSent(false), 3000);
+  // In-app interactive rider chat modal state
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    {
+      sender: "rider",
+      text: "Hi! I'm carrying your Feasto order. Let me know if you have any delivery instructions!",
+      time: "Just now"
+    }
+  ]);
+  const [inputMsg, setInputMsg] = useState("");
+  const [isRiderTyping, setIsRiderTyping] = useState(false);
+  const chatBottomRef = useRef(null);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (showChatModal) {
+      chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, isRiderTyping, showChatModal]);
+
+  const sendChatMessage = (textToSend) => {
+    const msgText = textToSend || inputMsg;
+    if (!msgText || !msgText.trim()) return;
+
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setChatMessages((prev) => [...prev, { sender: "user", text: msgText.trim(), time: now }]);
+    setInputMsg("");
+
+    // Simulate rider typing & response
+    setIsRiderTyping(true);
+    setTimeout(() => {
+      setIsRiderTyping(false);
+      let replyText = "Got it! I will follow your instructions 👍";
+      const lower = msgText.toLowerCase();
+      if (lower.includes("eta") || lower.includes("far") || lower.includes("when")) {
+        replyText = "I'm on my way! Should arrive in about 5 to 10 minutes 🛵";
+      } else if (lower.includes("door") || lower.includes("leave")) {
+        replyText = "Sure thing, I'll place the food packet right at your doorstep!";
+      } else if (lower.includes("ring") || lower.includes("bell")) {
+        replyText = "Noted! I'll give a quick ring when I'm outside.";
+      }
+
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender: "rider",
+          text: replyText,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+    }, 1200);
   };
 
   // Status mapping to indices
@@ -74,7 +121,6 @@ export default function TrackOrder() {
     fetchOrderDetails();
 
     const interval = setInterval(() => {
-      // Only poll if order is not delivered yet
       setOrder((prevOrder) => {
         if (prevOrder && prevOrder.status !== "Delivered") {
           fetchOrderDetails();
@@ -91,7 +137,7 @@ export default function TrackOrder() {
     return (
       <div className="track-loading-container">
         <div className="track-spinner"></div>
-        <p>Connecting to kitchen trackers...</p>
+        <p>Fetching real-time order tracking...</p>
       </div>
     );
   }
@@ -138,13 +184,16 @@ export default function TrackOrder() {
       desc: "Courier is speeding to your door",
       icon: (
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M5 13l4 4L19 7" />
+          <rect x="1" y="3" width="15" height="13" rx="2" />
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+          <circle cx="5.5" cy="18.5" r="2.5" />
+          <circle cx="18.5" cy="18.5" r="2.5" />
         </svg>
       ),
     },
     {
       title: "Delivered",
-      desc: "Enjoy your fresh warm meal!",
+      desc: "Enjoy your delicious Feasto meal!",
       icon: (
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -155,43 +204,30 @@ export default function TrackOrder() {
 
   return (
     <div className="track-order-page">
-      {order.status === "Delivered" && (
-        <div className="confetti-container">
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-          <div className="confetti-piece"></div>
-        </div>
-      )}
 
-      {/* Top Breadcrumb & Status Info */}
-      <div className="page-intro">
-        <span className="page-intro-eyebrow">Warm premium diner</span>
-        <div className="intro-header-flex">
-          <div>
-            <h1>Order Tracker</h1>
-            <p>Order ID: <span className="highlight-text">#{order._id}</span></p>
-          </div>
-          <div className="live-badge-wrapper">
-            <span className={`live-badge ${order.status === "Delivered" ? "completed" : "pulsing"}`}>
-              <span className="dot"></span>
-              {order.status === "Delivered" ? "Delivered" : "Live Tracking Active"}
-            </span>
-            <button
-              onClick={() => fetchOrderDetails(true)}
-              className={`btn-refresh ${isRefreshing ? "spinning" : ""}`}
-              disabled={isRefreshing}
-              title="Refresh status"
-            >
-              🔄
-            </button>
-          </div>
+      {/* Header Banner */}
+      <div className="tracker-banner">
+        <div className="banner-left">
+          <span className="live-badge">
+            <span className="pulse-dot"></span> LIVE TRACKING
+          </span>
+          <h1>Order #{order._id.substring(order._id.length - 6).toUpperCase()}</h1>
+          <p className="order-time-stamp">
+            Placed on {new Date(order.date).toLocaleDateString()} at {new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+        <div className="banner-right">
+          <button
+            className={`btn-refresh ${isRefreshing ? "spin" : ""}`}
+            onClick={() => fetchOrderDetails(true)}
+            title="Refresh Order Status"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M23 4v6h-6M1 20v-6h6" />
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
@@ -230,9 +266,9 @@ export default function TrackOrder() {
           <div className="receipt-paper">
             <div className="receipt-header">
               <h3>Order Receipt</h3>
-              <p>Paid successfully via Stripe</p>
+              <p>Paid successfully</p>
             </div>
-            
+
             <div className="receipt-items">
               {order.items.map((item, idx) => (
                 <div key={idx} className="receipt-item-row">
@@ -308,24 +344,12 @@ export default function TrackOrder() {
                 </div>
               </div>
               <div className="rider-actions">
-                <a
-                  href={`https://wa.me/${order.riderPhone ? order.riderPhone.replace(/[^\d]/g, '') : '919876543210'}?text=${encodeURIComponent(
-                    `Hi ${order.riderName}, I'm tracking my Feasto order #${order._id.slice(-6).toUpperCase()}. Could you please share an update on your ETA? 🛵`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rider-contact-btn whatsapp"
+                <button
+                  onClick={() => setShowChatModal(true)}
+                  className="rider-contact-btn inapp-chat"
                 >
-                  💬 WhatsApp
-                </a>
-                <a
-                  href={`sms:${order.riderPhone || '+919876543210'}?body=${encodeURIComponent(
-                    `Hi ${order.riderName}, tracking Feasto order #${order._id.slice(-6).toUpperCase()} - any update?`
-                  )}`}
-                  className="rider-contact-btn sms"
-                >
-                  📱 SMS Text
-                </a>
+                  💬 Chat with Rider
+                </button>
               </div>
             </div>
           )}
@@ -338,12 +362,69 @@ export default function TrackOrder() {
         </div>
       </div>
 
-      {/* Custom self-contained toast notification */}
-      {riderMessageSent && (
-        <div className="rider-toast-notification">
-          💬 Message sent to {order.riderName}!
+      {/* 💬 In-App Interactive Rider Chat Drawer / Modal */}
+      {showChatModal && (
+        <div className="inapp-chat-overlay" onClick={() => setShowChatModal(false)}>
+          <div className="inapp-chat-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="inapp-chat-header">
+              <div className="rider-chat-header-info">
+                <div className="rider-avatar-small">🛵</div>
+                <div>
+                  <h4>{order.riderName || "Delivery Partner"}</h4>
+                  <span className="rider-status-online">🟢 Active in transit</span>
+                </div>
+              </div>
+              <button className="chat-close-btn" onClick={() => setShowChatModal(false)}>✕</button>
+            </div>
+
+            <div className="inapp-chat-body">
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`chat-bubble-row ${msg.sender}`}>
+                  <div className="chat-bubble">
+                    <p>{msg.text}</p>
+                    <span className="chat-time">{msg.time}</span>
+                  </div>
+                </div>
+              ))}
+              {isRiderTyping && (
+                <div className="chat-bubble-row rider">
+                  <div className="chat-bubble typing-bubble">
+                    <span className="typing-dots">
+                      <span>.</span><span>.</span><span>.</span>
+                    </span>
+                    <span className="typing-text">Rider is typing</span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatBottomRef} />
+            </div>
+
+            {/* Quick action preset chips */}
+            <div className="chat-preset-chips">
+              <button onClick={() => sendChatMessage("Please leave the food packet at door 🚪")}>
+                🚪 Leave at door
+              </button>
+              <button onClick={() => sendChatMessage("What is your current ETA? ⏱️")}>
+                ⏱️ Check ETA
+              </button>
+              <button onClick={() => sendChatMessage("Ring bell upon arrival 🔔")}>
+                🔔 Ring bell
+              </button>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); sendChatMessage(); }} className="inapp-chat-footer">
+              <input
+                type="text"
+                placeholder="Type delivery note or message..."
+                value={inputMsg}
+                onChange={(e) => setInputMsg(e.target.value)}
+              />
+              <button type="submit" disabled={!inputMsg.trim()}>Send</button>
+            </form>
+          </div>
         </div>
       )}
+
     </div>
   );
 }
