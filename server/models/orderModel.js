@@ -14,11 +14,11 @@ const orderSchema = new mongoose.Schema({
   // Customer notes / cooking instructions (e.g., "Less spicy, no onions")
   notes:            { type: String,  default: "" },
 
-  // ── Rider assignment ────────────────────────────────────────────
+  // ── Rider assignment & Validation ─────────────────────────────────
+  riderId:          { type: mongoose.Schema.Types.ObjectId, ref: 'rider', default: null },
   riderName:        { type: String,  default: "" },
-
-  // Phone number used for click-to-call on TrackOrder page
   riderPhone:       { type: String,  default: "" },
+  deliveryOtp:      { type: String,  default: "" },
 
   // GPS coordinates set by admin (or future rider app)
   // [lng, lat] in decimal degrees – used to place the live map pin

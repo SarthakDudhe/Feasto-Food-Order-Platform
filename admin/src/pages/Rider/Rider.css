@@ -146,7 +146,136 @@
 
 .rider-order-card.delivered {
   opacity: 0.75;
-  background: #faf7f5;
+  background: #fdfdfd;
+}
+
+/* ── Auth Forms ── */
+.rider-auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.rider-auth-form {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.rider-auth-form h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.rider-auth-form input, .rider-auth-form select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.rider-auth-btn {
+  background: #ff5a3d;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.rider-auth-toggle {
+  text-align: center;
+  font-size: 13px;
+  color: #ff5a3d;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.rider-logout-btn {
+  background: #fff;
+  border: 1px solid #ff5a3d;
+  color: #ff5a3d;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ── OTP Modal ── */
+.otp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.otp-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+.otp-modal h3 {
+  margin-bottom: 10px;
+}
+
+.otp-modal p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.otp-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  letter-spacing: 15px;
+  text-align: center;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.otp-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.otp-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #eee;
+  color: #333;
+}
+
+.btn-verify {
+  background: #10b981;
+  color: white;
 }
 
 /* Card Header */

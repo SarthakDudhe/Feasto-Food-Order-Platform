@@ -215,6 +215,11 @@ export default function TrackOrder() {
           <p className="order-time-stamp">
             Placed on {new Date(order.date).toLocaleDateString()} at {new Date(order.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </p>
+          {order.deliveryOtp && (
+            <div className="otp-badge" style={{marginTop: "10px", display: "inline-block", background: "#ffeae5", color: "#ff5a3d", padding: "6px 12px", borderRadius: "8px", fontWeight: "bold"}}>
+              Delivery OTP: <span style={{fontSize: "20px", letterSpacing: "2px"}}>{order.deliveryOtp}</span>
+            </div>
+          )}
         </div>
         <div className="banner-right">
           <button

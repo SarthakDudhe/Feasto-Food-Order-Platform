@@ -1,5 +1,5 @@
 import express from "express";
-import { listOrders, placeOrder, updateStatus, userOrders, verifyOrder, getOrderDetail, getOrderAnalytics, assignRider, updateRiderLocation } from "../controllers/orderController.js";
+import { listOrders, placeOrder, updateStatus, userOrders, verifyOrder, getOrderDetail, getOrderAnalytics, assignRider, updateRiderLocation, verifyDeliveryOtp } from "../controllers/orderController.js";
 import authMiddleware from "../middleware/auth.js"
 
 const orderRouter = express.Router()
@@ -13,5 +13,6 @@ orderRouter.post("/status",updateStatus)
 orderRouter.get("/analytics",getOrderAnalytics)
 orderRouter.post("/assign",assignRider)
 orderRouter.post("/update-location",updateRiderLocation)
+orderRouter.post("/verify-delivery", verifyDeliveryOtp)
 
-export default orderRouter;
+export default orderRouter;

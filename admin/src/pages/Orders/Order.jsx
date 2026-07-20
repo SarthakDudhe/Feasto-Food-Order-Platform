@@ -14,16 +14,18 @@ const Order = ({url}) => {
   const [viewMode, setViewMode] = useState("list")
   const [checkedItems, setCheckedItems] = useState({})
 
-  // Rider registry — name → { phone, lat, lng (home/depot location) }
-  // Update these with your real fleet details
-  const riderRegistry = {
-    "John Doe (Scooter)":    { phone: "+919876543210", lat: 19.0760, lng: 72.8777 },
-    "Jane Smith (E-Bike)":   { phone: "+919876543211", lat: 19.0820, lng: 72.8820 },
-    "Bob Johnson (Van)":     { phone: "+919876543212", lat: 19.0700, lng: 72.8750 },
-    "Alice Williams (Walk)": { phone: "+919876543213", lat: 19.0790, lng: 72.8800 },
-  };
+  const [riders, setRiders] = useState([])
 
-  const riderNames = Object.keys(riderRegistry);
+  const fetchRiders = async () => {
+    try {
+      const response = await axios.get(url + "/api/rider/list")
+      if (response.data.success) {
+        setRiders(response.data.data)
+      }
+    } catch (error) {
+      console.error("Error fetching riders", error)
+    }
+  }
 
   const fetchAllOrders = async () => {
     const response = await axios.get(url + "/api/order/list")
@@ -49,14 +51,14 @@ const Order = ({url}) => {
     }
   }
 
-  const assignRiderHandler = async (orderId, riderName) => {
-    const riderInfo = riderRegistry[riderName] || {};
-    const response = await axios.post(url + "/api/order/assign", {
+  const assignRiderHandler = async (orderId, riderId) => {
+    if (!riderId) return;
+    const riderInfo = riders.find(r => r._id === riderId) || {};
+    const response = await axios.post(url + "/api/order/assign-rider", {
       orderId,
-      riderName,
+      riderId,
+      riderName: riderInfo.name || "",
       riderPhone: riderInfo.phone || "",
-      riderLat:   riderInfo.lat   ?? undefined,
-      riderLng:   riderInfo.lng   ?? undefined,
     })
     if (response.data.success) {
       toast.success("Rider assigned successfully")
@@ -83,6 +85,7 @@ const Order = ({url}) => {
 
   useEffect(() => {
     fetchAllOrders()
+    fetchRiders()
 
     const handleAfterPrint = () => {
       setActivePrintOrder(null)
@@ -322,12 +325,12 @@ const Order = ({url}) => {
                       <label>Courier Rider</label>
                       <select
                         onChange={(event) => assignRiderHandler(selectedOrder._id, event.target.value)}
-                        value={selectedOrder.riderName || ""}
+                        value={selectedOrder.riderId || selectedOrder.riderName || ""}
                         className="rider-select"
                       >
                         <option value="">Assign Rider</option>
-                        {riderNames.map((r) => (
-                          <option key={r} value={r}>{r}</option>
+                        {riders.map((r) => (
+                          <option key={r._id} value={r._id}>{r.name} ({r.vehicleType})</option>
                         ))}
                       </select>
                     </div>

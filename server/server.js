@@ -7,6 +7,7 @@ import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import AIrouter from "./routes/aiRoute.js";
+import riderRouter from "./routes/riderRoute.js";
 
 
 
@@ -26,6 +27,7 @@ app.use("/api/user",userRouter)
 app.use("/api/cart",cartRouter)
 app.use("/api/order",orderRouter)
 app.use("/api/ai",AIrouter)
+app.use("/api/rider",riderRouter)
 
 app.get("/",(req,res)=>{
 res.send("Server is Live !")

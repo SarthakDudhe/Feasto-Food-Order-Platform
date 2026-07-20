@@ -26,7 +26,8 @@ const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173"
         coupon:coupon ? {
             code:coupon.code,
             discount
-        } : null
+        } : null,
+        deliveryOtp: Math.floor(1000 + Math.random() * 9000).toString()
     })
 
 await newOrder.save();
@@ -236,13 +237,14 @@ const getOrderAnalytics = async (req, res) => {
 // Assign a delivery rider to an order (with phone & GPS location)
 const assignRider = async (req, res) => {
   try {
-    const { orderId, riderName, riderPhone, riderLat, riderLng } = req.body;
+    const { orderId, riderId, riderName, riderPhone, riderLat, riderLng } = req.body;
 
-    if (!orderId || !riderName) {
-      return res.json({ success: false, message: "orderId and riderName are required" });
+    if (!orderId || !riderName || !riderId) {
+      return res.json({ success: false, message: "orderId, riderId and riderName are required" });
     }
 
     const updatePayload = {
+      riderId,
       riderName,
       riderPhone: riderPhone || "",
       riderUpdatedAt: new Date(),
@@ -304,5 +306,30 @@ const updateRiderLocation = async (req, res) => {
   }
 };
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation}
+// Verify delivery OTP
+const verifyDeliveryOtp = async (req, res) => {
+  try {
+    const { orderId, otp } = req.body;
+    if (!orderId || !otp) {
+      return res.json({ success: false, message: "orderId and otp are required" });
+    }
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+    if (order.deliveryOtp !== otp) {
+      return res.json({ success: false, message: "Invalid OTP" });
+    }
+    
+    // Mark as delivered
+    order.status = "Delivered";
+    await order.save();
+    
+    res.json({ success: true, message: "Order successfully delivered!" });
+  } catch (error) {
+    console.error(error.message);
+    res.json({ success: false, message: "Error verifying OTP" });
+  }
+}
 
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation,verifyDeliveryOtp}
