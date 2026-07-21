@@ -19,7 +19,9 @@ const riderSchema = new mongoose.Schema({
       reason: { type: String, required: true },
       severity: { type: String, enum: ["Low", "Medium", "High"], required: true }
     }
-  ]
+  ],
+  averageRating: { type: Number, default: 5 },
+  totalRatings: { type: Number, default: 0 }
 }, { minimize: false });
 
 const riderModel = mongoose.models.rider || mongoose.model("rider", riderSchema);

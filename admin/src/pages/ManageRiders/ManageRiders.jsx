@@ -152,9 +152,15 @@ const ManageRiders = ({ url }) => {
                 <div key={rider._id} className={`rider-profile-card ${status.toLowerCase()}`}>
                   <div className="rider-card-header">
                     <h3>{rider.name}</h3>
-                    <span className={`status-badge badge-${status.toLowerCase()}`}>
-                      {status}
-                    </span>
+                    <div className="header-right-meta">
+                      <span className="rider-avg-rating">
+                        ⭐ {rider.averageRating ? rider.averageRating.toFixed(1) : '5.0'}
+                        <small>({rider.totalRatings || 0})</small>
+                      </span>
+                      <span className={`status-badge badge-${status.toLowerCase()}`}>
+                        {status}
+                      </span>
+                    </div>
                   </div>
                   
                   <div className="rider-details">
@@ -184,7 +190,13 @@ const ManageRiders = ({ url }) => {
           <div className="rider-modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{selectedRider.name} - Profile Management</h2>
-              <button className="close-btn" onClick={closeRiderDetails}>✕</button>
+              <div className="modal-header-meta">
+                <span className="rider-avg-rating-lg">
+                  ⭐ {selectedRider.averageRating ? selectedRider.averageRating.toFixed(1) : '5.0'} 
+                  <small>({selectedRider.totalRatings || 0} Ratings)</small>
+                </span>
+                <button className="close-btn" onClick={closeRiderDetails}>✕</button>
+              </div>
             </div>
 
             <div className="modal-body">

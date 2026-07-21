@@ -356,4 +356,64 @@ const addChatMessage = async (req, res) => {
   }
 }
 
-export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation,verifyDeliveryOtp,addChatMessage}
+// Submit Rider Review
+const submitRiderReview = async (req, res) => {
+  try {
+    const { orderId, rating, feedback } = req.body;
+    if (!orderId || !rating) {
+      return res.json({ success: false, message: "orderId and rating are required" });
+    }
+
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    if (order.isRated) {
+      return res.json({ success: false, message: "Order already rated" });
+    }
+
+    order.riderRating = rating;
+    order.isRated = true;
+    await order.save();
+
+    // Update Rider's average rating
+    if (order.riderId) {
+      import("../models/riderModel.js").then(async ({ default: riderModel }) => {
+        const rider = await riderModel.findById(order.riderId);
+        if (rider) {
+          const newTotalRatings = rider.totalRatings + 1;
+          const newAverageRating = ((rider.averageRating * rider.totalRatings) + rating) / newTotalRatings;
+          rider.totalRatings = newTotalRatings;
+          rider.averageRating = newAverageRating;
+
+          // Automated Escalation for low ratings
+          if (rating <= 3 && feedback) {
+            let severity = "Low";
+            if (feedback.toLowerCase().includes("safety") || feedback.toLowerCase().includes("tampered")) {
+              severity = "High";
+              if (rider.accountStatus === "Active") rider.accountStatus = "Suspended";
+            } else if (feedback.toLowerCase().includes("damaged") || feedback.toLowerCase().includes("unprofessional")) {
+              severity = "Medium";
+            }
+            
+            rider.misconductReports.push({
+              reason: `Customer Rating (${rating} Stars): ${feedback}`,
+              severity,
+              date: new Date()
+            });
+          }
+
+          await rider.save();
+        }
+      }).catch(err => console.error("Error loading riderModel for rating:", err));
+    }
+
+    res.json({ success: true, message: "Review submitted successfully!" });
+  } catch (error) {
+    console.error(error.message);
+    res.json({ success: false, message: "Error submitting review" });
+  }
+}
+
+export {placeOrder,verifyOrder,userOrders,listOrders,updateStatus,getOrderDetail,getOrderAnalytics,assignRider,updateRiderLocation,verifyDeliveryOtp,addChatMessage,submitRiderReview}

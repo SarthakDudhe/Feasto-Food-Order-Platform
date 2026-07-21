@@ -17,11 +17,17 @@ export default function TrackOrder() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pollCount, setPollCount] = useState(0);
 
-  // Real-time Chat state
   const [showChatModal, setShowChatModal] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [inputMsg, setInputMsg] = useState("");
   const chatBottomRef = useRef(null);
+
+  // Rating State
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedbackChip, setFeedbackChip] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   
   // Socket ref to avoid re-creation
   const socketRef = useRef(null);
@@ -104,6 +110,9 @@ export default function TrackOrder() {
         if (response.data.data.chat) {
           setChatMessages(response.data.data.chat);
         }
+        if (response.data.data.status === "Delivered" && !response.data.data.isRated) {
+          setShowRatingModal(true);
+        }
         if (socketRef.current) {
           socketRef.current.emit("join_order_room", orderId);
         }
@@ -144,6 +153,30 @@ export default function TrackOrder() {
 
     return () => clearInterval(interval);
   }, [orderId, token]);
+
+  const submitReview = async () => {
+    if (rating === 0) return;
+    setIsSubmittingReview(true);
+    try {
+      const res = await axios.post(`${url}/api/order/submit-review`, {
+        orderId,
+        rating,
+        feedback: feedbackChip
+      }, { headers: { token } });
+      
+      if (res.data.success) {
+        setOrder(prev => ({ ...prev, isRated: true, riderRating: rating }));
+        setShowRatingModal(false);
+      } else {
+        alert(res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -428,6 +461,56 @@ export default function TrackOrder() {
               />
               <button type="submit" disabled={!inputMsg.trim()}>Send</button>
             </form>
+          </div>
+        </div>
+      )}
+
+    </div>
+
+      {/* ⭐️ Post-Delivery Rating Modal */}
+      {showRatingModal && (
+        <div className="inapp-chat-overlay">
+          <div className="rating-modal">
+            <div className="rating-modal-header">
+              <h3>How was your delivery?</h3>
+              <button className="chat-close-btn" onClick={() => setShowRatingModal(false)}>✕</button>
+            </div>
+            <div className="rating-modal-body">
+              <p>Please rate your experience with <strong>{order.riderName || "your rider"}</strong></p>
+              <div className="stars-container">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span 
+                    key={star}
+                    className={`star ${star <= (hoverRating || rating) ? 'filled' : ''}`}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setRating(star)}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              
+              {rating > 0 && rating <= 3 && (
+                <div className="feedback-chips-section fade-in">
+                  <h4>What went wrong?</h4>
+                  <div className="chips-grid">
+                    <button className={feedbackChip === 'Late Delivery' ? 'selected' : ''} onClick={() => setFeedbackChip('Late Delivery')}>⏳ Late Delivery</button>
+                    <button className={feedbackChip === 'Unprofessional' ? 'selected' : ''} onClick={() => setFeedbackChip('Unprofessional')}>😠 Unprofessional</button>
+                    <button className={feedbackChip === 'Food Damaged' ? 'selected' : ''} onClick={() => setFeedbackChip('Food Damaged')}>📦 Food Damaged</button>
+                    <button className={`chip-danger ${feedbackChip === 'Safety Issue' ? 'selected' : ''}`} onClick={() => setFeedbackChip('Safety Issue')}>🛑 Safety Issue</button>
+                  </div>
+                </div>
+              )}
+
+              <button 
+                className="btn-submit-review" 
+                disabled={rating === 0 || isSubmittingReview || (rating <= 3 && !feedbackChip)}
+                onClick={submitReview}
+              >
+                {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </div>
           </div>
         </div>
       )}

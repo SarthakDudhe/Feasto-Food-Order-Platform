@@ -36,6 +36,10 @@ const orderSchema = new mongoose.Schema({
 
   // Timestamp of the last location update (shown on TrackOrder as "last seen")
   riderUpdatedAt:   { type: Date,    default: null },
+
+  // ── Rider Rating & Feedback ──────────────────────────────────────────
+  riderRating:      { type: Number,  default: 0 },
+  isRated:          { type: Boolean, default: false }
 })
 
 const orderModel = mongoose.models.order || mongoose.model("order",orderSchema) 
