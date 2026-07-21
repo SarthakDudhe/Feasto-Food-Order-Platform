@@ -1,106 +1,330 @@
 .manage-riders-page {
-  padding: 20px;
+  padding: 30px;
+  max-width: 1200px;
 }
 
 .manage-riders-loading {
-  text-align: center;
   padding: 50px;
+  text-align: center;
   font-size: 18px;
   color: #666;
 }
 
-.riders-list-container {
-  margin-top: 30px;
+.page-intro {
+  margin-bottom: 30px;
+}
+
+.page-intro-eyebrow {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ff5a3d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.page-intro h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #333;
+  margin: 8px 0;
+}
+
+.page-intro p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Tabs */
+.rider-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 15px;
+}
+
+.rider-tabs button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  color: #888;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.rider-tabs button:hover {
+  background: #f4f4f4;
+}
+
+.rider-tabs button.active {
+  color: #ff5a3d;
+  background: #fff0eb;
+}
+
+.no-riders-msg {
+  text-align: center;
+  padding: 60px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px dashed #ddd;
+  color: #666;
 }
 
 .riders-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
 
 .rider-profile-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
+  background: #ffffff;
   border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 24px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.2s ease;
 }
 
 .rider-profile-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
-}
-
-.rider-profile-card.pending {
-  border-left: 4px solid #f59e0b;
-}
-
-.rider-profile-card.verified {
-  border-left: 4px solid #10b981;
+  border-color: #ddd;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.05);
 }
 
 .rider-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
 }
 
 .rider-card-header h3 {
-  margin: 0;
   font-size: 18px;
+  font-weight: 800;
   color: #333;
+  margin: 0;
 }
 
 .status-badge {
+  font-size: 11px;
+  font-weight: 800;
   padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.badge-pending {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.badge-verified {
-  background: #d1fae5;
-  color: #059669;
-}
+.badge-pending { background: #fff4e5; color: #b76e00; }
+.badge-active { background: #e6ffed; color: #137333; }
+.badge-suspended { background: #fff0eb; color: #ff5a3d; }
+.badge-blocked { background: #ffe6e6; color: #cf1322; }
 
 .rider-details p {
-  margin: 8px 0;
   font-size: 14px;
-  color: #555;
+  color: #666;
+  margin: 6px 0;
 }
 
-.rider-details strong {
-  color: #333;
-  width: 70px;
+.strikes-warning {
+  color: #cf1322 !important;
+  font-weight: bold;
+  background: #ffe6e6;
+  padding: 6px 10px;
+  border-radius: 6px;
   display: inline-block;
+  margin-top: 10px !important;
 }
 
-.rider-actions {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px dashed #eaeaea;
-}
-
-.btn-verify-rider {
+.btn-manage-rider {
   width: 100%;
-  background: #10b981;
+  padding: 12px;
+  background: #f4f4f4;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.btn-manage-rider:hover {
+  background: #e6e6e6;
+}
+
+/* Modal Overlay */
+.rider-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.rider-modal-content {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.management-section {
+  margin-bottom: 20px;
+}
+
+.management-section h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.management-section hr {
+  border: none;
+  border-top: 1px solid #eaeaea;
+  margin: 24px 0;
+}
+
+/* Checkboxes */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: #444;
+  cursor: pointer;
+}
+
+.btn-save-verification {
+  background: #ff5a3d;
   color: white;
   border: none;
-  padding: 10px;
+  padding: 10px 16px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s;
 }
 
-.btn-verify-rider:hover {
-  background: #059669;
+/* Status Buttons */
+.status-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
 }
+
+.status-buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-activate { background: #e6ffed; color: #137333; }
+.btn-activate:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
+.btn-suspend { background: #fff0eb; color: #ff5a3d; }
+.btn-suspend:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
+.btn-block { background: #ffe6e6; color: #cf1322; }
+.btn-block:disabled { background: #f0f0f0; color: #aaa; cursor: not-allowed; }
+
+/* Misconduct Form */
+.misconduct-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.misconduct-form input {
+  flex: 2;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.misconduct-form select {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.btn-add-strike {
+  background: #cf1322;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.misconduct-history h4 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.misconduct-history ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.misconduct-history li {
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.severity-low { background: #f9f9f9; border-left: 3px solid #ccc; }
+.severity-medium { background: #fff4e5; border-left: 3px solid #faad14; }
+.severity-high { background: #ffe6e6; border-left: 3px solid #cf1322; }

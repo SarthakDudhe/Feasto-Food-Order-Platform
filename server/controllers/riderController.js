@@ -11,8 +11,14 @@ const loginRider = async (req, res) => {
         if (!rider) {
             return res.json({ success: false, message: "Rider doesn't exist" })
         }
-        if (!rider.isVerified) {
+        if (rider.accountStatus === "Pending") {
             return res.json({ success: false, message: "Your account is pending admin approval." })
+        }
+        if (rider.accountStatus === "Suspended") {
+            return res.json({ success: false, message: "Your account is temporarily suspended." })
+        }
+        if (rider.accountStatus === "Blocked") {
+            return res.json({ success: false, message: "Your account is blocked for policy violations." })
         }
         const isMatch = await bcrypt.compare(password, rider.password);
         if (!isMatch) {
@@ -74,7 +80,7 @@ const listRiders = async (req, res) => {
     }
 }
 
-// verify rider (Admin only)
+// verify rider (Legacy Admin verification - deprecated but updated to use accountStatus)
 const verifyRider = async (req, res) => {
     try {
         const { riderId } = req.body;
@@ -82,7 +88,12 @@ const verifyRider = async (req, res) => {
         if (!rider) {
             return res.json({ success: false, message: "Rider not found" });
         }
-        rider.isVerified = true;
+        rider.accountStatus = "Active";
+        rider.verificationDetails = {
+            idVerified: true,
+            vehicleDocsVerified: true,
+            backgroundCheckPassed: true
+        };
         await rider.save();
         res.json({ success: true, message: "Rider successfully verified!" });
     } catch (error) {
@@ -91,4 +102,78 @@ const verifyRider = async (req, res) => {
     }
 }
 
-export { loginRider, registerRider, listRiders, verifyRider }
+// update rider account status
+const updateRiderAccountStatus = async (req, res) => {
+    try {
+        const { riderId, status } = req.body;
+        const rider = await riderModel.findById(riderId);
+        if (!rider) {
+            return res.json({ success: false, message: "Rider not found" });
+        }
+        if (!["Pending", "Active", "Suspended", "Blocked"].includes(status)) {
+            return res.json({ success: false, message: "Invalid status" });
+        }
+        rider.accountStatus = status;
+        await rider.save();
+        res.json({ success: true, message: `Rider account marked as ${status}` });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error updating account status" });
+    }
+}
+
+// update verification parameters
+const updateVerificationParameters = async (req, res) => {
+    try {
+        const { riderId, idVerified, vehicleDocsVerified, backgroundCheckPassed } = req.body;
+        const rider = await riderModel.findById(riderId);
+        if (!rider) {
+            return res.json({ success: false, message: "Rider not found" });
+        }
+        
+        rider.verificationDetails.idVerified = idVerified;
+        rider.verificationDetails.vehicleDocsVerified = vehicleDocsVerified;
+        rider.verificationDetails.backgroundCheckPassed = backgroundCheckPassed;
+        
+        // Auto-activate if all three are passed and currently pending
+        if (idVerified && vehicleDocsVerified && backgroundCheckPassed && rider.accountStatus === "Pending") {
+            rider.accountStatus = "Active";
+        }
+        
+        await rider.save();
+        res.json({ success: true, message: "Verification details updated", rider });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error updating verification details" });
+    }
+}
+
+// add misconduct report
+const addMisconductReport = async (req, res) => {
+    try {
+        const { riderId, reason, severity } = req.body;
+        if (!reason || !severity) {
+            return res.json({ success: false, message: "Reason and severity are required" });
+        }
+
+        const rider = await riderModel.findById(riderId);
+        if (!rider) {
+            return res.json({ success: false, message: "Rider not found" });
+        }
+
+        rider.misconductReports.push({ reason, severity, date: new Date() });
+        
+        // Example Automated Rule: Suspend if High severity
+        if (severity === "High" && rider.accountStatus === "Active") {
+            rider.accountStatus = "Suspended";
+        }
+
+        await rider.save();
+        res.json({ success: true, message: "Misconduct report added successfully" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error adding misconduct report" });
+    }
+}
+
+export { loginRider, registerRider, listRiders, verifyRider, updateRiderAccountStatus, updateVerificationParameters, addMisconductReport }

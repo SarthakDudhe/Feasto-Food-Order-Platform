@@ -7,7 +7,19 @@ const riderSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   vehicleType: { type: String, default: "Scooter" },
   status: { type: String, default: "Available" },
-  isVerified: { type: Boolean, default: false }
+  accountStatus: { type: String, enum: ["Pending", "Active", "Suspended", "Blocked"], default: "Pending" },
+  verificationDetails: {
+    idVerified: { type: Boolean, default: false },
+    vehicleDocsVerified: { type: Boolean, default: false },
+    backgroundCheckPassed: { type: Boolean, default: false }
+  },
+  misconductReports: [
+    {
+      date: { type: Date, default: Date.now },
+      reason: { type: String, required: true },
+      severity: { type: String, enum: ["Low", "Medium", "High"], required: true }
+    }
+  ]
 }, { minimize: false });
 
 const riderModel = mongoose.models.rider || mongoose.model("rider", riderSchema);
