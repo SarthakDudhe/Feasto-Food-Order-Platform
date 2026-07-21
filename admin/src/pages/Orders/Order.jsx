@@ -89,11 +89,19 @@ const Order = ({url}) => {
     fetchAllOrders()
     fetchRiders()
 
+    const intervalId = setInterval(() => {
+      fetchAllOrders()
+      fetchRiders()
+    }, 5000);
+
     const handleAfterPrint = () => {
       setActivePrintOrder(null)
     }
     window.addEventListener('afterprint', handleAfterPrint)
-    return () => window.removeEventListener('afterprint', handleAfterPrint)
+    return () => {
+      clearInterval(intervalId)
+      window.removeEventListener('afterprint', handleAfterPrint)
+    }
   }, [])
 
   // Filter and Sort in memory

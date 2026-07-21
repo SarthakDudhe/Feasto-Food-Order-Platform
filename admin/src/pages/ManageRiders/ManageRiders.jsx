@@ -31,6 +31,10 @@ const ManageRiders = ({ url }) => {
 
   useEffect(() => {
     fetchRiders();
+    const intervalId = setInterval(() => {
+      fetchRiders();
+    }, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const openRiderDetails = (rider) => {
