@@ -464,9 +464,6 @@ export default function TrackOrder() {
           </div>
         </div>
       )}
-
-    </div>
-
       {/* ⭐️ Post-Delivery Rating Modal */}
       {showRatingModal && (
         <div className="inapp-chat-overlay">
