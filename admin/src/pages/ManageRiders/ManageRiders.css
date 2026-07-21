@@ -371,3 +371,28 @@
 .severity-low { background: #f9f9f9; border-left: 3px solid #ccc; }
 .severity-medium { background: #fff4e5; border-left: 3px solid #faad14; }
 .severity-high { background: #ffe6e6; border-left: 3px solid #cf1322; }
+
+@media (max-width: 768px) {
+  .manage-riders-page {
+    padding: 15px;
+  }
+  .riders-grid {
+    grid-template-columns: 1fr;
+  }
+  .misconduct-form {
+    flex-direction: column;
+  }
+  .rider-tabs {
+    flex-wrap: wrap;
+  }
+  .status-buttons {
+    flex-direction: column;
+  }
+  .rider-card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .header-right-meta {
+    align-items: flex-start;
+  }
+}

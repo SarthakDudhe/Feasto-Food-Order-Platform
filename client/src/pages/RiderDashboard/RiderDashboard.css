@@ -403,3 +403,28 @@
   max-width: 500px;
   margin: 0 auto;
 }
+
+@media (max-width: 768px) {
+  .rider-portal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .driver-stats-bar {
+    grid-template-columns: 1fr;
+  }
+  .rider-orders-grid {
+    grid-template-columns: 1fr;
+  }
+  .rider-card-actions {
+    flex-wrap: wrap;
+  }
+  .btn-rider-action {
+    flex: 1 1 45%;
+    padding: 12px 6px;
+    font-size: 12px;
+  }
+  .rider-auth-form {
+    padding: 20px;
+  }
+}
