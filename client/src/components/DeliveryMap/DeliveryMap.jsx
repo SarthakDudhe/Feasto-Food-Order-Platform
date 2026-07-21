@@ -98,12 +98,12 @@ export default function DeliveryMap({ order, statusIndex }) {
 
   // UI state
   const [mapReady,  setMapReady]  = useState(false);
-  const [phase,     setPhase]     = useState("idle"); // idle | requesting | loading | done
+  const [phase,     setPhase]     = useState("loading"); // requesting | loading | done
   const [routeInfo, setRouteInfo] = useState(null);   // { etaMinutes, distanceKm, isFallback }
 
   // Single atomic location object — prevents race conditions
   // Shape: { coords:[lng,lat], isFallback:boolean } | null
-  const [locData, setLocData] = useState(null);
+  const [locData, setLocData] = useState({ coords: FALLBACK.coords, isFallback: true });
 
   // Stable primitives — prevent draw effect from re-running on every server poll
   const orderId   = order._id;
@@ -250,22 +250,20 @@ export default function DeliveryMap({ order, statusIndex }) {
   return (
     <div className="dm-wrapper">
 
-      {/* Location permission prompt */}
-      {phase === "idle" && (
-        <div className="dm-location-prompt">
-          <div className="dm-prompt-icon">📍</div>
-          <h4>See Your Delivery Route</h4>
-          <p>
-            Share your location to view the live route from{" "}
-            <strong>Feasto Kitchen, Bandra</strong> to your door.
-          </p>
-          <button className="dm-share-btn" onClick={handleShare}>
-            <span>📡</span> Share My Location
-          </button>
-          <button className="dm-demo-btn" onClick={handleDemo}>
-            Use Demo Location instead
-          </button>
-        </div>
+      {/* Optional: A small floating button to request real GPS if currently using fallback */}
+      {phase === "done" && locData?.isFallback && (
+        <button 
+          onClick={handleShare}
+          style={{
+            position: 'absolute', top: 10, right: 10, zIndex: 30,
+            background: 'white', border: 'none', padding: '8px 12px',
+            borderRadius: '20px', fontSize: '12px', fontWeight: 'bold',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px'
+          }}
+        >
+          <span>📍</span> Use My GPS Location
+        </button>
       )}
 
       {/* Loading overlays */}
@@ -284,7 +282,7 @@ export default function DeliveryMap({ order, statusIndex }) {
       <div
         ref={mapContainer}
         className="dm-map"
-        style={{ visibility: phase === "idle" ? "hidden" : "visible" }}
+        style={{ visibility: phase === "requesting" ? "hidden" : "visible" }}
       />
 
       {/* Info panel */}
