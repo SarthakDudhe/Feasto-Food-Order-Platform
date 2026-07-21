@@ -28,6 +28,7 @@ export default function TrackOrder() {
   const [hoverRating, setHoverRating] = useState(0);
   const [feedbackChip, setFeedbackChip] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   
   // Socket ref to avoid re-creation
   const socketRef = useRef(null);
@@ -158,21 +159,38 @@ export default function TrackOrder() {
     if (rating === 0) return;
     setIsSubmittingReview(true);
     try {
-      const res = await axios.post(`${url}/api/order/submit-review`, {
+      const response = await axios.post(url + "/api/order/submit-review", {
         orderId,
         rating,
-        feedback: feedbackChip
+        feedback: rating <= 3 ? feedbackChip : ""
       }, { headers: { token } });
-      
-      if (res.data.success) {
-        setOrder(prev => ({ ...prev, isRated: true, riderRating: rating }));
+      if (response.data.success) {
         setShowRatingModal(false);
-      } else {
-        alert(res.data.message);
+        // Do not reload to avoid wiping chat, maybe just mark as reviewed locally
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const submitReport = async () => {
+    if (!feedbackChip) return;
+    setIsSubmittingReview(true);
+    try {
+      // Send a 1-star review implicitly to trigger misconduct escalation
+      const response = await axios.post(url + "/api/order/submit-review", {
+        orderId,
+        rating: 1, 
+        feedback: feedbackChip
+      }, { headers: { token } });
+      if (response.data.success) {
+        setShowReportModal(false);
+        setFeedbackChip("");
+      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setIsSubmittingReview(false);
     }
@@ -400,6 +418,16 @@ export default function TrackOrder() {
                 >
                   💬 Chat with Rider
                 </button>
+                <button
+                  onClick={() => {
+                    setFeedbackChip("");
+                    setShowReportModal(true);
+                  }}
+                  className="rider-contact-btn inapp-chat"
+                  style={{ background: 'transparent', border: '1px solid #ff5a3d', color: '#ff5a3d', marginTop: '8px' }}
+                >
+                  🚨 Report Issue
+                </button>
               </div>
             </div>
           )}
@@ -506,6 +534,38 @@ export default function TrackOrder() {
                 onClick={submitReview}
               >
                 {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🚨 Report Rider Modal */}
+      {showReportModal && (
+        <div className="inapp-chat-overlay">
+          <div className="rating-modal">
+            <div className="rating-modal-header">
+              <h3>Report an Issue</h3>
+              <button className="chat-close-btn" onClick={() => setShowReportModal(false)}>✕</button>
+            </div>
+            <div className="rating-modal-body">
+              <p>Please let us know what went wrong with <strong>{order.riderName || "your rider"}</strong></p>
+              
+              <div className="feedback-chips-section fade-in">
+                <div className="chips-grid">
+                  <button className={feedbackChip === 'Unprofessional' ? 'selected' : ''} onClick={() => setFeedbackChip('Unprofessional')}>😠 Unprofessional</button>
+                  <button className={feedbackChip === 'Not Answering' ? 'selected' : ''} onClick={() => setFeedbackChip('Not Answering')}>📵 Not Answering</button>
+                  <button className={`chip-danger ${feedbackChip === 'Safety Issue' ? 'selected' : ''}`} onClick={() => setFeedbackChip('Safety Issue')}>🛑 Safety Issue</button>
+                </div>
+              </div>
+
+              <button 
+                className="btn-submit-review" 
+                style={{ background: '#ff5a3d' }}
+                disabled={!feedbackChip || isSubmittingReview}
+                onClick={submitReport}
+              >
+                {isSubmittingReview ? 'Submitting...' : 'Submit Report'}
               </button>
             </div>
           </div>
