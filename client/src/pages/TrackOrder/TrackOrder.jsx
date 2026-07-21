@@ -35,7 +35,7 @@ export default function TrackOrder() {
 
   useEffect(() => {
     if (url) {
-      socketRef.current = io(url);
+      socketRef.current = io(url, { transports: ["websocket"] });
       socketRef.current.on("receive_message", (data) => {
         if (data.orderId === orderId) {
           setChatMessages((prev) => [...prev, data]);

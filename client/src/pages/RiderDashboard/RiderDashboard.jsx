@@ -7,7 +7,7 @@ import "./RiderDashboard.css";
 const KITCHEN_COORDS = [72.8296, 19.0544];
 const url = "http://localhost:4000";
 
-const socket = io(url);
+const socket = io(url, { transports: ["websocket"] });
 
 export default function RiderDashboard() {
   const [token, setToken] = useState(localStorage.getItem("riderToken") || "");
